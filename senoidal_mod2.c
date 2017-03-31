@@ -6,7 +6,6 @@ double senoid(double PASO_TEMP);
 
 int main(void){
 	double s;
-	
 	scanf("%lf",&s);
 	printf("senoid(s)");
 	
@@ -21,6 +20,7 @@ double senoid(double PASO_TEMP){
 	double amp;
 	double senoid;
 	double arg;
+	double t
 	
 	printf("%s", "MSJ_SEN_FRQ");
 	scanf("%lf", &frec);
@@ -35,11 +35,13 @@ double senoid(double PASO_TEMP){
 	scanf("%lf", &amp);
 	while(getchar()!='\n');
 	
-	arg=2*pi*frec*PASO_TEMP+fase;
-	
-	senoid=amp*(sin(arg));
-	
-	return senoid;
+	for(t=t_in;t<t_fin;t+=PASO_TEMP){
+		
+		arg=2*pi*frec*PASO_TEMP+fase;
+		senoid=amp*(sin(arg));
+		printf("%lf | %lf",PASO_TEMP,senoid);
+	}
+	return EXIT_SUCCESS;
 }
 
 
