@@ -3,10 +3,10 @@
 #include <math.h>
 
 #define Msj_ENTRADA "Bienvenido!\n"                                                         /*A esto se refieren con no "hardcodear"?*/
-#define Msj_INICIO "Si se desea muestrar una funcion oprima 1, de lo contrario oprima 0:\n"
-#define Msj_PARAMETROS "Elija el tiempo inicial de muestro, el tiempo final, y el paso temporal:\n"
-#define Msj_MENU "ELija la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n-3 Loglineal\n-4 Exponencial\n-5 Heaviside\n-6 Mrua\n-7 Paraboloide Hiperbolico\n-8 Volver al inicio\n"
-#define Msj_CIERRE "Fin del programa\n"
+#define Msj_INICIO "\nSi se desea muestrar una funcion oprima 1, de lo contrario oprima 0:\n"
+#define Msj_PARAMETROS "\nElija el tiempo inicial de muestro, el tiempo final, y el paso temporal:\n"
+#define Msj_MENU "\nELija la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n-3 Loglineal\n-4 Exponencial\n-5 Heaviside\n-6 Mrua\n-7 Paraboloide Hiperbolico\n-8 Volver al inicio\n"
+#define Msj_CIERRE "\nFin del programa\n"
 
 void menu(int caso,float tiempoi,float tiempof,float espacio);  /*funcion que cree con el switch que seria el menu y las funciones, etc. Habria que poner las funciones ahi*/
 
@@ -37,7 +37,7 @@ int main (void)
             
             if(tf<ti)                               /*Esto es para evitar un bucle!*/
             { 
-                printf("ERROR, el tiempo final es menor al inicial\n"); /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo*/
+                printf("\nERROR, el tiempo final es menor al inicial\n"); /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo*/
             }            
             else
             {    
