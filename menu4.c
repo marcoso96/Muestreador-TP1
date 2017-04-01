@@ -9,10 +9,18 @@
 #define Msj_PARAMETROS "\nIngrese el tiempo inicial de muestro, el tiempo final, y la cantidad de muestras:\n"
 #define Msj_MENU "\nSeleccione la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n-3 Loglineal\n-4 Exponencial\n-5 Heaviside\n-6 Mrua\n-7 Paraboloide Hiperbolico\n-8 Volver al inicio\n\n"
 #define Msj_CIERRE "Fin del programa\n"
+
+#define MSJ_INI_TI "Ingrese el tiempo inicial: "
+#define MSJ_INI_TF "Ingrese el tiempo final: "
+#define MSJ_INI_MUE "Ingrese la cantidad de muestras: "
+#define MSJ_INI_PRE "Ingrese la precision a utilizar: "
+
 #define pi 3.14159
+
 #define MSJ_SEN_FRQ "\nIngrese la frecuencia\n"
 #define MSJ_SEN_FAS "\nIngrese la fase\n"
 #define MSJ_SEN_AMP "\nIngrese la amplitud\n"
+
 #define MSJ_MRUA_POS "\nIngese la posicion inicial\n"
 #define MSJ_MRUA_VEL "\nIngrese la velocidad inicial\n"
 #define MSJ_MRUA_ACEL "\nIngrese la aceleracion\n"
@@ -27,7 +35,7 @@ void opt_mrua(int indic);
 int main (void)
 {
     int inicio,opcmenu;
-    float Prm[4];        /* vector que sirve para guardar los parametros basicos*/
+    float Prm[3];        /* vector que sirve para guardar los parametros basicos*/
     float esp;          /* variable espacio que se deja por cada muestra*/
     int i;
     printf ("%s", Msj_ENTRADA);
@@ -44,15 +52,15 @@ int main (void)
 
         else                        /*Aca empieza el menu*/
         {
-            for (i=1; i<=4 ; i++)                /*ESte ciclo for es para ir rellenando el vector con parametros*/
+            for (i=0; i<=3 ; i++)                /*ESte ciclo for es para ir rellenando el vector con parametros*/
             {
                 opciones(i);                    /*Es una funcion que cree para no tener tantos printf y scanf*/
                 scanf ("%f", &Prm[i]);
             }                                        /* Prm[0]=tiempoinicial, Prm[1]= tiempofinal, Prm[2]=cantidaddemuestras, Prm[3]=precision*/
 
-            esp = (Prm[2]-Prm[1])/Prm[3];              /*HUbiera estado bueno cambiar el nombre de los prm[] pero me da error :( */
+            esp = (Prm[1]-Prm[0])/Prm[2];              /*HUbiera estado bueno cambiar el nombre de los prm[] pero me da error :( */
 
-            if(Prm[2]<Prm[1])                               /*Esto es para evitar un bucle!*/
+            if(Prm[1]<Prm[0]||Prm[3]<0)                               /*Esto es para evitar un bucle!*/
             {
                 printf("ERROR, el tiempo final es menor al inicial\n"); /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo */
             }
@@ -61,7 +69,7 @@ int main (void)
                 printf ("%s", Msj_MENU);    /*Aca se imprime el menu, y se pide la opcion que el usuario quiere*/
                 scanf("%d",&opcmenu);
 
-                menu(opcmenu,Prm[1],Prm[2],esp,Prm[4]);            /*uso de la funcion menu que cree*/
+                menu(opcmenu,Prm[0],Prm[1],esp,Prm[3]);            /*uso de la funcion menu que cree*/
 
             }
         }
@@ -109,10 +117,10 @@ void opciones(int caso2)
 {
 switch (caso2)
         {
-            case 1: printf("Ingrese el tiempo inicial: "); break;
-            case 2: printf("Ingrese el tiempo final: "); break;
-            case 3: printf("Ingrese la cantidad de muestras: "); break;
-            case 4: printf("Ingrese la precision a utilizar: "); break;
+            case 0: printf("%s", MSJ_INI_TI); break;
+            case 1: printf("%s", MSJ_INI_TF); break;
+            case 2: printf("%s", MSJ_INI_MUE); break;
+            case 3: printf("%s", MSJ_INI_PRE); break;
         }
 return;
 }
@@ -122,7 +130,7 @@ void senoid(float tiempoi, float tiempof, float espacio)
 
    float fase=0;
    float amp;
-   float frq;/*prsn=Parametros seno*/
+   float frq;                                /*prsn=Parametros seno*/
    int i_s;
    float t;
    float arg;
@@ -130,7 +138,7 @@ void senoid(float tiempoi, float tiempof, float espacio)
     printf("%s",MSJ_SEN_FRQ);
     scanf("%f",&frq);
 
-    printf("%s",MSJ_SEN_AMP);
+    printf("%s",MSJ_SEN_AMP);               /*declare variables por separado, los arrays me fallaban siempre*/
     scanf("%f",&amp);
 
     printf("%s",MSJ_SEN_FAS);
