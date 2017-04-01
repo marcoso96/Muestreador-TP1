@@ -1,11 +1,11 @@
-/*El programa anda! Si quieren pruebenlo, lo unico, cuando pide la funcion, elijan el logaritmo que es la unica que puse hasta ahora!*/
+/*El programa anda! Si quieren pruebenlo, lo unico, cuando pide la funcion, elijan el logaritmo o loglineal que son las unicas que puse hasta ahora!*/
 #include <stdio.h>
 #include <math.h>
 
 #define Msj_ENTRADA "Bienvenido!\n"                                                         /*A esto se refieren con no "hardcodear"?*/
 #define Msj_INICIO "Si se desea muestrar una funcion oprima 1, de lo contrario oprima 0:\n"
 #define Msj_PARAMETROS "Elija el tiempo inicial de muestro, el tiempo final, y el paso temporal:\n"
-#define Msj_MENU "ELija la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n"
+#define Msj_MENU "ELija la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n-3 Loglineal\n-4 Exponencial\n-5 Heaviside\n-6 Mrua\n-7 Paraboloide Hiperbolico\n-8 Volver al inicio\n"
 #define Msj_CIERRE "Fin del programa\n"
 
 void menu(int caso,int tiempoi, int tiempof,int espacio);  /*funcion que cree con el switch que seria el menu y las funciones, etc. Habria que poner las funciones ahi*/
@@ -56,6 +56,7 @@ int main (void)
                        
 void menu(int caso,int tiempoi, int tiempof,int espacio)
 {
+    double aux;                         /*Esta variable usenla como quieran, sirve como variable auxiliar*/
     switch(caso)                                
                 {
                     case 1:                                 /*Vayan agregando sus funciones aca!*/
@@ -67,6 +68,14 @@ void menu(int caso,int tiempoi, int tiempof,int espacio)
                             for (tiempoi ; tiempoi<=tiempof ; tiempoi+=espacio)    
                             {
                                 printf("log(%d):%f\n", tiempoi, log10(tiempoi));
+                            }
+                            break;
+                    
+                     case 3:
+                             for (tiempoi ; tiempoi<=tiempof ; tiempoi+=espacio)    
+                            {   
+                                aux= tiempoi*log10(tiempoi);
+                                printf("%dlog(%d):%f\n", tiempoi, tiempoi, aux);
                             }
                             break;
 
