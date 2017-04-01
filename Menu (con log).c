@@ -1,3 +1,4 @@
+/*El programa anda! Si quieren pruebenlo, lo unico, cuando pide la funcion, elijan el logaritmo que es la unica que puse hasta ahora!*/
 #include <stdio.h>
 #include <math.h>
 
