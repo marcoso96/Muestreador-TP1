@@ -36,7 +36,7 @@ int main (void)
             
             if(tf<ti)                               /*Esto es para evitar un bucle!*/
             { 
-                printf("ERROR, el tiempo final es menor al inicial\n"; /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo*/
+                printf("ERROR, el tiempo final es menor al inicial\n"); /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo*/
             }            
             else
             {    
