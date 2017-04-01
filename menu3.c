@@ -22,7 +22,7 @@ void opciones(int caso2);                                                       
 int main (void)
 {
     int inicio,opcmenu;
-    float Prm[4];        /* vector que sirve para guardar los parametros basicos*/
+    float Prm[3];        /* vector que sirve para guardar los parametros basicos*/
     float esp;          /* variable espacio que se deja por cada muestra*/
     int i;
     printf ("%s", Msj_ENTRADA);
@@ -39,15 +39,15 @@ int main (void)
 
         else                        /*Aca empieza el menu*/
         {
-            for (i=1; i<=4 ; i++)                /*ESte ciclo for es para ir rellenando el vector con parametros*/
+            for (i=0; i<=3 ; i++)                /*ESte ciclo for es para ir rellenando el vector con parametros*/
             {
                 opciones(i);                    /*Es una funcion que cree para no tener tantos printf y scanf*/
                 scanf ("%f", &Prm[i]);
             }                                        /* Prm[0]=tiempoinicial, Prm[1]= tiempofinal, Prm[2]=cantidaddemuestras, Prm[3]=precision*/
 
-            esp = (Prm[2]-Prm[1])/Prm[3];              /*HUbiera estado bueno cambiar el nombre de los prm[] pero me da error :( */
+            esp = (Prm[1]-Prm[0])/Prm[2];              /*HUbiera estado bueno cambiar el nombre de los prm[] pero me da error :( */
 
-            if(Prm[2]<Prm[1])                               /*Esto es para evitar un bucle!*/
+            if(Prm[1]<Prm[0])                               /*Esto es para evitar un bucle!*/
             {
                 printf("ERROR, el tiempo final es menor al inicial\n"); /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo */
             }
@@ -56,7 +56,7 @@ int main (void)
                 printf ("%s", Msj_MENU);    /*Aca se imprime el menu, y se pide la opcion que el usuario quiere*/
                 scanf("%d",&opcmenu);
 
-                menu(opcmenu,Prm[1],Prm[2],esp,Prm[4]);            /*uso de la funcion menu que cree*/
+                menu(opcmenu,Prm[0],Prm[1],esp,Prm[3]);            /*uso de la funcion menu que cree*/
 
             }
         }
@@ -105,10 +105,10 @@ void opciones(int caso2)
 {
 switch (caso2)
         {
-            case 1: printf("Ingrese el tiempo inicial: "); break;
-            case 2: printf("Ingrese el tiempo final: "); break;
-            case 3: printf("Ingrese la cantidad de muestras: "); break;
-            case 4: printf("Ingrese la precision a utilizar: "); break;
+            case 0: printf("Ingrese el tiempo inicial: "); break;
+            case 1: printf("Ingrese el tiempo final: "); break;
+            case 2: printf("Ingrese la cantidad de muestras: "); break;
+            case 3: printf("Ingrese la precision a utilizar: "); break;
         }
 return;
 }
