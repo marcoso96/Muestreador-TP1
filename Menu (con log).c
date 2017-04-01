@@ -10,7 +10,6 @@
 
 void menu(int caso,int tiempoi, int tiempof,int espacio);  /*funcion que cree con el switch que seria el menu y las funciones, etc. Habria que poner las funciones ahi*/
 
-
 int main (void)
 {    
     int n,a,ti,tf,s; /*se podria considerar un cambio en el nombre de las variables en caso de que no se entiendan*/
@@ -47,14 +46,14 @@ int main (void)
                 menu(a,ti,tf,s);            /*uso de la funcion menu que cree*/
 
             }
-        }
-        
+        }   
     }
 
     while (n!=0);           /*Mientras que el usuario siga oprimiendo 1 en vez de 0, el programa no termina, lo deja graficar cuantas veces quiera y diferetes funciones con diferentes parametros*/
     return 0;
 }
-
+/*Termino el main*/
+                       
 void menu(int caso,int tiempoi, int tiempof,int espacio)
 {
     switch(caso)                                
