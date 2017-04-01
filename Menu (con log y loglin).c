@@ -1,7 +1,7 @@
 /*El programa anda! Si quieren pruebenlo, lo unico, cuando pide la funcion, elijan el logaritmo o loglineal que son las unicas que puse hasta ahora!*/
 #include <stdio.h>
 #include <math.h>
-
+   /*IMPORTANTE, no se como se hace lo de la precision todavia*/
    /*A esto se refieren con no "hardcodear"?*/
 #define Msj_INICIO "\nIngerese lo que se desea hacer:\n1. Muestrar una funcion predefinida\n0. Salir\n"
 #define Msj_PARAMETROS "\nIngrese el tiempo inicial de muestro, el tiempo final, y la cantidad de muestras:\n"
