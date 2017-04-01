@@ -25,18 +25,18 @@
 #define MSJ_MRUA_VEL "\nIngrese la velocidad inicial\n"
 #define MSJ_MRUA_ACEL "\nIngrese la aceleracion\n"
 
-void opcsen(int i_s);
+
 void senoid(float tiempoi, float tiempof, float espacio);
 void menu(int caso,float tiempoi,float tiempof,float espacio, float precision);  /*funcion que cree con el switch que seria el menu y las funciones, etc. Habria que poner las funciones ahi*/
 void opciones(int caso2);                                                         /*Otra funcion mas*/
 void mrua(float tiempoi, float tiempof, float espacio);
-void opt_mrua(int indic);
 
 int main (void)
 {
     int inicio,opcmenu;
-    float Prm[3];        /* vector que sirve para guardar los parametros basicos*/
-    float esp;          /* variable espacio que se deja por cada muestra*/
+    float Prm[3];   /* vector que sirve para guardar los parametros basicos*/
+	float Parab[5];  /*guarda variables de paraboloide( x _inicial, Y_inicial, a, b, intervalo, prec)*/
+	float esp;          /* variable espacio que se deja por cada muestra*/
     int i;
     printf ("%s", Msj_ENTRADA);
 
@@ -45,33 +45,44 @@ int main (void)
         printf ("%s", Msj_INICIO); /*se pregunta si se quiere muestrar una fucion, si tipean 0 el programa termina*/
         scanf("%d",&inicio);
 
-        if(inicio==0)
-        {
-            printf ("%s", Msj_CIERRE);
+        if(inicio==0){
+            
+			printf ("%s", Msj_CIERRE);
         }
+		else {
+			
+			printf("%s", Msj_MENU)
+			scanf("%d", &opcmenu);
+			
+			if (opcmenu!=7){
+				
+				for (i=0; i<=3 ; i++){                /*ESte ciclo for es para ir rellenando el vector con parametros*/
+				
+					opciones(i);                    /*Es una funcion que cree para no tener tantos printf y scanf*/
+					scanf ("%f", &Prm[i]);
+				}                                        /* Prm[0]=tiempoinicial, Prm[1]= tiempofinal, Prm[2]=cantidaddemuestras, Prm[3]=precision*/
 
-        else                        /*Aca empieza el menu*/
-        {
-            for (i=0; i<=3 ; i++)                /*ESte ciclo for es para ir rellenando el vector con parametros*/
-            {
-                opciones(i);                    /*Es una funcion que cree para no tener tantos printf y scanf*/
-                scanf ("%f", &Prm[i]);
-            }                                        /* Prm[0]=tiempoinicial, Prm[1]= tiempofinal, Prm[2]=cantidaddemuestras, Prm[3]=precision*/
-
-            esp = (Prm[1]-Prm[0])/Prm[2];              /*HUbiera estado bueno cambiar el nombre de los prm[] pero me da error :( */
-
-            if(Prm[1]<Prm[0]||Prm[3]<0)                               /*Esto es para evitar un bucle!*/
-            {
-                printf("ERROR, el tiempo final es menor al inicial\n"); /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo */
-            }
-            else
-            {
-                printf ("%s", Msj_MENU);    /*Aca se imprime el menu, y se pide la opcion que el usuario quiere*/
-                scanf("%d",&opcmenu);
-
-                menu(opcmenu,Prm[0],Prm[1],esp,Prm[3]);            /*uso de la funcion menu que cree*/
-
-            }
+				esp = (Prm[1]-Prm[0])/Prm[2];
+                
+				if(Prm[1]<Prm[0]||Prm[3]<0){                               /*Esto es para evitar un BUCL*/ 
+                
+				printf("ERROR, el tiempo final es menor al inicial\n"); /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo */
+				}				
+				
+				else{
+					menu(opcmenu,Prm[0],Prm[1],esp,Prm[3]);						/*HUbiera estado bueno cambiar el nombre de los prm[] pero me da error :( */
+				}
+			}
+			
+			else if(opcmenu==7){
+					
+					for(i=0; i<=3; i++){
+						
+						opc_par(i);/*scanf si escanea un 7 de paraboloide, desarrolla menu parab*/ /*uso de la funcion menu que cree*/
+						scanf("%f", &Parab[3]);
+					}
+			}
+            
         }
     }
 
@@ -122,6 +133,20 @@ switch (caso2)
             case 2: printf("%s", MSJ_INI_MUE); break;
             case 3: printf("%s", MSJ_INI_PRE); break;
         }
+return;
+}
+
+
+void opc_par(int caso3)
+{
+switch (caso3)
+        {
+            case 0: printf("%s", MSJ_PAR_XO); break;
+            case 1: printf("%s", MSJ_PAR_YO); break;
+            case 2: printf("%s", MSJ_PAR_A); break;
+            case 3: printf("%s", MSJ_PAR_B); break;
+			case 4: printf("%s", MSJ_PAR_INTER); break;
+			case 5: printf("%s", MSJ_PAR_PREC); break;}
 return;
 }
 
@@ -179,3 +204,5 @@ void mrua(float tiempoi, float tiempof, float espacio){
     return;
 }
 
+
+	
