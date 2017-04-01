@@ -8,12 +8,13 @@
 #define Msj_MENU "ELija la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n-3 Loglineal\n-4 Exponencial\n-5 Heaviside\n-6 Mrua\n-7 Paraboloide Hiperbolico\n-8 Volver al inicio\n"
 #define Msj_CIERRE "Fin del programa\n"
 
-void menu(int caso,int tiempoi, int tiempof,int espacio);  /*funcion que cree con el switch que seria el menu y las funciones, etc. Habria que poner las funciones ahi*/
+void menu(int caso,float tiempoi,float tiempof,float espacio);  /*funcion que cree con el switch que seria el menu y las funciones, etc. Habria que poner las funciones ahi*/
 
 int main (void)
 {    
-    int n,a,ti,tf,s; /*se podria considerar un cambio en el nombre de las variables en caso de que no se entiendan*/
-
+    int n,a; /*se podria considerar un cambio en el nombre de las variables en caso de que no se entiendan*/
+    float ti,tf,s;
+    
     printf ("%s", Msj_ENTRADA);
     
     do
@@ -29,8 +30,8 @@ int main (void)
         else
         {    
             printf ("%s", Msj_PARAMETROS);          /*Aca se va pidiendo los parametro tipo tiempo inicial, etc*/
-            scanf("%d",&ti);                        /*Hay alguna forma de mejorar esto de los scanf?*/
-            scanf("%d",&tf);                        
+            scanf("%f",&ti);                        /*Hay alguna forma de mejorar esto de los scanf?*/
+            scanf("%f",&tf);                        
             scanf("%d",&n);
             s= (tf-ti)/n;                           /*Aca se guarda el valor del espacio temporal, en mi caso esta variable la uso en el for, para las funciones*/
             
@@ -54,9 +55,9 @@ int main (void)
 }
 /*Termino el main*/
                        
-void menu(int caso,int tiempoi, int tiempof,int espacio)
+void menu(int caso,float tiempoi, float tiempof,float espacio)
 {
-    double aux;                         /*Esta variable usenla como quieran, sirve como variable auxiliar*/
+    float aux;                         /*Esta variable usenla como quieran, sirve como variable auxiliar*/
     switch(caso)                                
                 {
                     case 1:                                 /*Vayan agregando sus funciones aca!*/
@@ -67,7 +68,7 @@ void menu(int caso,int tiempoi, int tiempof,int espacio)
                         
                             for (tiempoi ; tiempoi<=tiempof ; tiempoi+=espacio)    
                             {
-                                printf("log(%d):%f\n", tiempoi, log10(tiempoi));
+                                printf("log(%f):%f\n", tiempoi, log10(tiempoi));
                             }
                             break;
                     
@@ -75,7 +76,7 @@ void menu(int caso,int tiempoi, int tiempof,int espacio)
                              for (tiempoi ; tiempoi<=tiempof ; tiempoi+=espacio)    
                             {   
                                 aux= tiempoi*log10(tiempoi);
-                                printf("%dlog(%d):%f\n", tiempoi, tiempoi, aux);
+                                printf("(%f)*log(%f):%f\n", tiempoi, tiempoi, aux);
                             }
                             break;
 
