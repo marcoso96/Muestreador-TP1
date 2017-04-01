@@ -15,7 +15,7 @@
         #define MSJ_SEN_AMP "\nIngrese la amplitud\n"
     
     void opcsen(int i_s);
-    float senoid(float tiempoii);
+    void senoid(float tiempoi);
     void menu(int caso,float tiempoi,float tiempof,float espacio, float precision);  /*funcion que cree con el switch que seria el menu y las funciones, etc. Habria que poner las funciones ahi*/
     void opciones(int caso2);                                                         /*Otra funcion mas*/
     
@@ -77,7 +77,6 @@
                                 for(tiempoi; tiempoi<tiempof; tiempoi+=espacio)
                                 { 
                                    senoid(tiempoi);
-                                   printf("%f:%f",tiempoi, senoid(tiempoi));
                                 }          
                                 break;
                             
@@ -117,30 +116,29 @@ void opciones(int caso2)
     return;
 }
 
-float senoid(float tiempoii)
+void senoid(float tiempoi)
 {
        
-       enum sen {fase,frec,amp};
+       enum senparam {fase,frec,amp};
        float prsn[2]; /*prsn=Parametros seno*/
        int i_s;
-       float arg,senoidal;
-        
+              
        for(i_s=0 ; i_s<3 ; i_s++){
            opcsen(i_s);
            scanf("%f",&prsn[i_s]);
        }
-      
-       arg=(2*pi*prsn[frec]*tiempoii)+prsn[fase];
-       senoidal = prsn[amp]*sin(arg);
+     	for(tiempoi=0 ; tiempoi<=tiempof ; tiempoi+=espacio){
+			printf("%f:%f\n", tiempoi, prsn[amp]*sin(2*pi*prsn[frec]*tiempoi+prsn[fase]);
+	   }
         
-       return senoidal;
+       return;
     }
     
 void opcsen(int i_s){
         
         switch(i_s){
-                case 0: printf("%s",MSJ_SEN_FRQ);break;
-                    case 1:    printf("%s",MSJ_SEN_FAS);break;
+                    case 0: printf("%s",MSJ_SEN_FRQ);break;
+                    case 1: printf("%s",MSJ_SEN_FAS);break;
                     case 2: printf("%s",MSJ_SEN_AMP);break;
         }
         return;
