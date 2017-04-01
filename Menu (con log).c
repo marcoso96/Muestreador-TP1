@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <math.h>
 
-#define Msj_ENTRADA "Bienvenido!\n"                                                                        /*A esto se refieren con no "hardcodear"?*/
+#define Msj_ENTRADA "Bienvenido!\n"                                               /*A esto se refieren con no "hardcodear"?*/
 #define Msj_INICIO "Si se desea muestrar una funcion oprima 1, de lo contrario oprima 0:\n"
-#define Msj_PARAMETROS "Elija el tiempo inicial de muestro, el tiempo final, y la precision:\n"
-#define Msj_MENU "ELija la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n"
+#define Msj_PARAMETROS "Elija el tiempo inicial de muestro, el tiempo final, y la cantidad de muestras:\n"
+#define Msj_MENU "ELija la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n" 
 #define Msj_CIERRE "Fin del programa\n"
 
 
