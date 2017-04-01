@@ -5,6 +5,7 @@
    /*A esto se refieren con no "hardcodear"?*/
    /*Si, supongo que si ponemos todos los define, en un mismo archivo .h, se puede hacer mucho mas prolijo. O por funcion, ya que por los menos
    las que piden mas parametros necesitan muchos*/
+#define Msj_ENTRADA
 #define Msj_INICIO "\nIngrese lo que se desea hacer:\n1. Muestrar una funcion predefinida\n0. Salir\n"
 #define Msj_PARAMETROS "\nIngrese el tiempo inicial de muestro, el tiempo final, y la cantidad de muestras:\n"
 #define Msj_MENU "\nSeleccione la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n-3 Loglineal\n-4 Exponencial\n-5 Heaviside\n-6 Mrua\n-7 Paraboloide Hiperbolico\n-8 Volver al inicio\n\n"
