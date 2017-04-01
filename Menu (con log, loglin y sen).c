@@ -1,13 +1,20 @@
 /*El programa anda! Si quieren pruebenlo, lo unico, cuando pide la funcion, elijan el logaritmo o loglineal que son las unicas que puse hasta ahora!*/
 #include <stdio.h>
 #include <math.h>
-   /*IMPORTANTE, no se como se hace lo de la precision todavia*/
+   /*IMPORTANTE, no se como se hace lo de la precision todavia*/ 
    /*A esto se refieren con no "hardcodear"?*/
-#define Msj_INICIO "\nIngerese lo que se desea hacer:\n1. Muestrar una funcion predefinida\n0. Salir\n"
+   /*Si, supongo que si ponemos todos los define, en un mismo archivo .h, se puede hacer mucho mas prolijo. O por funcion, ya que por los menos
+   las que piden mas parametros necesitan muchos*/
+#define Msj_INICIO "\nIngrese lo que se desea hacer:\n1. Muestrar una funcion predefinida\n0. Salir\n"
 #define Msj_PARAMETROS "\nIngrese el tiempo inicial de muestro, el tiempo final, y la cantidad de muestras:\n"
 #define Msj_MENU "\nSeleccione la funcion que se desea muestrar:\n-1 Seno\n-2 Logaritmo\n-3 Loglineal\n-4 Exponencial\n-5 Heaviside\n-6 Mrua\n-7 Paraboloide Hiperbolico\n-8 Volver al inicio\n\n"
 #define Msj_CIERRE "Fin del programa\n"
+#define pi 3.14159
+#define MSJ_SEN_FRQ"\nIngrese la frecuencia\n"
+#define MSJ_SEN_FAS "\nIngrese la fase\n"
+#define MSJ_SEN_AMP "\nIngrese la amplitud\n"
 
+float senoid(float tiempoi);
 void menu(int caso,float tiempoi,float tiempof,float espacio, float precision);  /*funcion que cree con el switch que seria el menu y las funciones, etc. Habria que poner las funciones ahi*/
 void opciones(int caso2);                                                         /*Otra funcion mas*/
 
@@ -65,15 +72,20 @@ void menu(int caso,float tiempoi, float tiempof,float espacio, float precision)
     float aux;                         /*Esta variable usenla como quieran, sirve como variable auxiliar*/
     switch(caso)                                
                 {
-                    case 1:                                 /*Vayan agregando sus funciones aca!*/
-            
+                    case 1:
+                            for(tiempoi; tiempoi<tiempof; tiempoi+=espacio)
+                            { 
+                               senoid(tiempoi);
+                               printf("%f:%f",tiempoi, senoid(tiempoi));
+                            }          
                             break;
                         
                     case 2:
                         
                             for (tiempoi ; tiempoi<tiempof ; tiempoi+=espacio)    
-                            {
-                                printf("log(%f):%f\n", tiempoi, log10(tiempoi));
+                            { 
+                               
+                                printf("%f:%f\n", tiempoi, log10(tiempoi));
                             }
                             break;
                     
@@ -84,7 +96,7 @@ void menu(int caso,float tiempoi, float tiempof,float espacio, float precision)
                                 printf("(%f)*log(%f):%f\n", tiempoi, tiempoi, aux);
                             }
                             break;
-
+                     case 
                         
                 }
     return;
@@ -100,4 +112,31 @@ void opciones(int caso2)
                 case 3: printf("Ingrese la precision a utilizar: "); break;
             }
     return;
+}
+
+float senoid(float(tiempoi)){
+   
+   enum {fase,frec,amp,arg}
+   float prsn[3]; /*prsn=Parametros seno*/
+	float arg;
+   
+	printf("%s", "MSJ_SEN_FRQ");
+	scanf("%f", &prsn[frec]);
+	while(getchar()!='\n');
+	
+	printf("%s", "MSJ_SEN_FAS");
+	scanf("%f", &prsn[fase]);
+	
+   if(getchar()=='\n') prsn[fase]=0;
+   while(getchar()!='\n');
+	
+	printf("%s", "MSJ_SEN_AMP");
+	scanf("%f", &prsn[amp]);
+	while(getchar()!='\n');
+	
+	arg=(2*pi*prsn[frec]*tiempo1)+prsn[fase];
+	
+	senoid=amp*(sin(arg));
+	
+	return senoid;
 }
