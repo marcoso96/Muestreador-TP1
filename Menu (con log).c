@@ -66,7 +66,6 @@ void menu(int caso,int tiempoi, int tiempof,int espacio)
                         
                             for (tiempoi ; tiempoi<=tiempof ; tiempoi+=espacio)    
                             {
-                                log10(tiempoi);
                                 printf("log(%d):%f\n", tiempoi, log10(tiempoi));
                             }
                             break;
