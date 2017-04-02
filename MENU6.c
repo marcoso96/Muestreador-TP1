@@ -41,17 +41,17 @@ void menu(int caso,float tiempoi,float tiempof,float espacio, float precision); 
 void opciones(int caso2);
 void menu_par(double x_in, double y_in, double cons_a, double cons_b, double intev, double muest, int prec);    /*Menu solo para paraboloide*/
 void opc_par(int caso3);
-void mrua(float tiempoi, float tiempof, float espacio, int prec);
-void senoid(float tiempoi, float tiempof, float espacio, int prec);
+void mrua(float tiempoi, float tiempof, float espacio, float prec);
+void senoid(float tiempoi, float tiempof, float espacio, float prec);
 
 int main (void){
 
     int inicio;
 	int opcmenu;
-    float Prm[2]; /* vector que sirve para guardar los parametros basicos*/
-	int prec;
+    float Prm[3]; /* vector que sirve para guardar los parametros basicos*/
+	int prec;        /*para paraboloide*/
 	double Parab[5];  /*guarda variables de paraboloide( x _inicial, Y_inicial, a, b, intervalo, muestras)*/
-	double esp;          /* variable espacio que se deja por cada muestra*/
+	float esp;          /* variable espacio que se deja por cada muestra*/
     int i, f_1=0, f_2=0;
 
 	printf ("%s", Msj_ENTRADA);
@@ -77,31 +77,7 @@ int main (void){
 
 			f_1=0;
 
-			if (opcmenu!=7){
-
-				for (i=0; i<=2 ; i++){                /*ESte ciclo for es para ir rellenando el vector con parametros*/
-
-					opciones(i);                    /*Es una funcion que cree para no tener tantos printf y scanf*/
-					scanf ("%f", &Prm[i]);
-				}                                        /* Prm[0]=tiempoinicial, Prm[1]= tiempofinal, Prm[2]=cantidaddemuestras, Prm[3]=precision*/
-
-				do{
-					printf("%s", MSJ_INI_PRE);
-					scanf("%f", &prec);/*consige el entero precision*/
-				}
-				while (prec<0);
-
-				esp = (Prm[1]-Prm[0])/Prm[2];
-
-				if(Prm[1]<Prm[0]){                               /*Esto es para evitar un BUCL*/
-
-				printf("ERROR, el tiempo final es menor al inicial\n"); /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo */
-				}
-
-                menu(opcmenu,Prm[0],Prm[1],esp,Prm[3]);						/*HUbiera estado bueno cambiar el nombre de los prm[] pero me da error :( */
-			}
-
-			else if(opcmenu==7){
+			if (opcmenu==7){
 
 				printf("%s", DISP_PARAB);
 
@@ -128,6 +104,30 @@ int main (void){
 
 			}
 
+
+			else {
+
+				for (i=0; i<4 ; i++){                /*ESte ciclo for es para ir rellenando el vector con parametros*/
+
+					opciones(i);                    /*Es una funcion que cree para no tener tantos printf y scanf*/
+					scanf ("%f", &Prm[i]);
+				}                                        /* Prm[0]=tiempoinicial, Prm[1]= tiempofinal, Prm[2]=cantidaddemuestras, Prm[3]=precision*/
+
+				do{
+					printf("%s", MSJ_INI_PRE);
+					scanf("%f", &prec);/*consige el entero precision*/
+				}
+				while (prec<0);
+
+				esp = (Prm[1]-Prm[0])/Prm[2];
+
+				if(Prm[1]<Prm[0]){                               /*Esto es para evitar un BUCL*/
+
+				printf("ERROR, el tiempo final es menor al inicial\n"); /*Aca creo que se podria usar lo del return exit_failure que usann en clase, pero no me deja compilar si lo pongo */
+				}
+
+              menu(opcmenu,Prm[0],Prm[1],esp,Prm[3]);						/*HUbiera estado bueno cambiar el nombre de los prm[] pero me da error :( */
+			}
         }
     }
 
@@ -136,7 +136,7 @@ int main (void){
 }
 /*Termino el programa*/
 
-void menu(int caso,float tiempoi, float tiempof,float espacio, float prec){
+void menu(int caso,float tiempoi,float tiempof,float espacio,float prec){
 
     float aux;                         /*Esta variable usenla como quieran, sirve como variable auxiliar*/
     switch(caso)
@@ -149,7 +149,7 @@ void menu(int caso,float tiempoi, float tiempof,float espacio, float prec){
                     case 2:
                             for (tiempoi ; tiempoi<tiempof ; tiempoi+=espacio)
                             {
-                                printf("%f:%.*f\n", tiempoi, prec, log10(tiempoi));
+                                printf("%f:%.*f\n", tiempoi, (int)prec, log10(tiempoi));
                             }
                             break;
 
@@ -157,14 +157,9 @@ void menu(int caso,float tiempoi, float tiempof,float espacio, float prec){
                              for (tiempoi ; tiempoi<tiempof ; tiempoi+=espacio)
                             {
                                 aux= tiempoi*log10(tiempoi);
-                                printf("%f:(%.*f)*log(%.*f)\n", tiempoi, prec, tiempoi, prec, aux);
+                                printf("%f:(%.*f)*log(%.*f)\n", tiempoi, (int)prec, tiempoi, prec, aux);
                             }
                             break;
-
-					case 4:
-
-					case 5:
-
 
                     case 6:
                             mrua(tiempoi, tiempof, espacio, prec);
@@ -183,7 +178,7 @@ void menu_par(double x_in, double y_in, double cons_a, double cons_b, double esp
 
 	for(x=x_in,y=y_in; x<=(x_in+(muest*espacio)); x+=espacio, y+=espacio){
 
-		printf("%f|%f|%.*f", x, y, prec, pow((x/cons_a),2)-pow((y/cons_b),2));
+		printf("%f|%f|%.*f", x, y, prec, (pow((x/cons_a),2))-(pow((y/cons_b),2)));
 
 	}
 	return;
@@ -195,6 +190,7 @@ switch (caso2){
             case 0: printf("%s", MSJ_INI_TI); break;
             case 1: printf("%s", MSJ_INI_TF); break;
             case 2: printf("%s", MSJ_INI_MUE); break;
+            case 3: printf("%s", MSJ_INI_PRE); break;
         }
 return;
 }
@@ -213,7 +209,7 @@ void opc_par(int caso3){
 return;
 }
 
-void senoid(float tiempoi, float tiempof, float espacio, int prec){
+void senoid(float tiempoi, float tiempof, float espacio, float prec){
 
 	float fase=0;
 	float amp;
@@ -234,13 +230,13 @@ void senoid(float tiempoi, float tiempof, float espacio, int prec){
     for(t=tiempoi ; t<tiempof ; t+=espacio){
 
         arg=sin((2*pi*(frq)*t)+fase);
-        printf("%f:%0.*f\n", t, prec, amp*arg);
+        printf("%f:%0.*f\n", t, (int)prec, amp*arg);
    }
 
    return;
 }
 
-void mrua(float tiempoi, float tiempof, float espacio, int prec){
+void mrua(float tiempoi, float tiempof, float espacio, float prec){
 
     float x_in, v_in, acel;
     int i;
@@ -261,7 +257,7 @@ void mrua(float tiempoi, float tiempof, float espacio, int prec){
 
         mrua=((x_in)+(v_in)*tm+(acel)*0.5*(pow(tm,2)));
 
-        printf("%f:%.*f\n",tm, prec, mrua);
+        printf("%f:%.*f\n",tm, (int)prec, mrua);
     }
     return;
 }
