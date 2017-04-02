@@ -147,7 +147,7 @@ void menu(int caso,float tiempoi,float tiempof,float espacio,float prec){
                             break;
 
                     case 2:
-                            for (tiempoi ; tiempoi<tiempof ; tiempoi+=espacio)
+                            for (tiempoi ; tiempoi<=tiempof ; tiempoi+=espacio)
                             {
                                 printf("%f:%.*f\n", tiempoi, (int)prec, log10(tiempoi));
                             }
@@ -178,7 +178,7 @@ void menu_par(double x_in, double y_in, double cons_a, double cons_b, double esp
 
 	for(x=x_in,y=y_in; x<=(x_in+(muest*espacio)); x+=espacio, y+=espacio){
 
-		printf("%f|%f|%.*f", x, y, prec, (pow((x/cons_a),2))-(pow((y/cons_b),2)));
+		printf("%f|%f|%.*f\n", x, y, prec, (pow((x/cons_a),2))-(pow((y/cons_b),2)));
 
 	}
 	return;
