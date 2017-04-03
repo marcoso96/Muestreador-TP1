@@ -4,7 +4,7 @@
 
 #include "muestreador.h"
 
-void menu(int caso,float tiempoi,float tiempof,float espacio, float precision);
+void menu(int caso,float tiempoi,float tiempof,float espacio, float prec);
 void opciones(int caso2);
 void menu_par(double x_in, double y_in, double cons_a, double cons_b, double intev, double muest, int prec);    /*Menu solo para paraboloide*/
 void opc_par(int caso3);
@@ -14,8 +14,8 @@ void senoid(float tiempoi, float tiempof, float espacio, float prec);
 int main (void)
 {
     int inicio, opcmenu,prec;
-    float Prm[2]; /* vector que sirve para guardar los parametros basicos*/
-    float Parab[5];  /*guarda variables de paraboloide( x _inicial, Y_inicial, a, b, intervalo, muestras)*/
+    float Prm[4]; /* vector que sirve para guardar los parametros basicos*/
+    float Parab[6];  /*guarda variables de paraboloide( x _inicial, Y_inicial, a, b, intervalo, muestras)*/
     double esp;          /* variable espacio que se deja por cada muestra*/
     int i, f_1=0, f_2=0;
     char s;
@@ -25,15 +25,7 @@ int main (void)
     do
     {
         printf ("%s", Msj_INICIO); /*se pregunta si se quiere muestrar una fucion, si tipean 0 el programa termina*/
-        do{
-            getchar();
-            s=getchar();
-
-            if(isalpha(s)!=0) printf("%s", MSJ_ERROR);              /*PROBLEMA VALIDAR DATOS*/
-
-            else inicio=(int)s;
-        }
-        while (isalpha(s)!=0);
+        scanf("%s", &inicio);
 
         if(inicio==0)
         {
@@ -163,6 +155,7 @@ void menu(int caso,float tiempoi, float tiempof,float espacio, float prec)
         case 6:
                    mrua(tiempoi, tiempof, espacio, prec);
                    break;
+            
    }
 
    return;
