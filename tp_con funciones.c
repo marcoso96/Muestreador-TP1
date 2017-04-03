@@ -8,6 +8,8 @@
 typedef  enum { SALIR=0, INGRESAR} t_bool;
 typedef  enum { Fun_Senoidal= 1, Fun_Log, Fun_Loglineal, Fun_Exp, Fun_escalon, Fun_mrua, Fun_phiper} t_funciones;
 typedef  enum { dato_amp=0, dato_fase=1, dato_frec=2 } t_parametros;
+typedef   enum  { mrua_x, mrua_v, mrua_a} t_mrua;
+
 
 void generador_muestras (float v[], float t[], int cant_muestras, int fun,float t_inicial, float t_final, int precision) ;
 float funcion_exponencial (float dato);
@@ -16,7 +18,9 @@ float funcion_senoidal (float dato, float AMP, float FASE, float FREC);
 
 void  cargar_datos_senoidal (float AMP, float FASE, float FREC);
 float cargar_seno (t_parametros datos);
+float cargar_mrua (t_mrua dato ) ;
 
+float  funcion_mrua(float dato,float  x,float v,float a) ;
 
 
 #define MAX_MUESTRAS  100
@@ -43,12 +47,18 @@ float cargar_seno (t_parametros datos);
 #define MSJ_ERROR         0
 #define MSJ_VALIDO        1
 #define MSJ_AMPLITUD   "Amplitud:  "
+
 #define FUNCION_SENOIDAL    "v (t)= amplitud * Sen(2 * pi * frecuencia * tiempo + fase)"
+#define FUNCION_MRUA        " x(t)= x+ v*t + 0.5*a*t^2 "
 
 #define MSJ_FASE      "Fase en radianes (Considerando un rango de 0 a 2*pi, (pi=3.1416): "
 #define MSJ_FRECUENCIA  "Frecuencia: "
 
 #define FUNCION_A_MUESTREAR  "Funcion a muestrear: "
+
+#define MSJ_MRUA_POS "\nIngrese la posicion inicial: "
+#define MSJ_MRUA_VEL "\nIngrese la velocidad inicial: "
+#define MSJ_MRUA_ACEL "\nIngrese la aceleracion: "
 
 
 
@@ -71,6 +81,8 @@ int main (void)
   int cant_muestras, precision;
   float v[MAX_MUESTRAS] , t[MAX_MUESTRAS] ;
   float AMP, FASE, FREC;
+
+
 
 /************************* MENU ***************************************/
 do{
@@ -150,35 +162,47 @@ switch (opciones) {
             break;
                 }
     case Fun_Senoidal: {
-                        printf("\t T\t\tValor\n\n");
+
                         generador_muestras (v, t, cant_muestras,Fun_Senoidal, t_inicial, t_final, precision);
 
                         break;
                         }
-    case Fun_Log:   {   /********************************/
 
+    case Fun_Log:   {
+                        printf("\t T\t\tValor\n\n");
+                        generador_muestras (v, t, cant_muestras,Fun_Log, t_inicial, t_final, precision);
 
-
-                    break;
+                        break;
                     }
-    case Fun_Loglineal: {   /**************************/
+    case Fun_Loglineal: {    printf("\t T\t\tValor\n\n");
+                            generador_muestras (v, t, cant_muestras,Fun_Loglineal, t_inicial, t_final, precision);
 
-                    break;}
+
+
+                            break;
+                        }
 
 
     case Fun_Exp: {
                     printf("\t T\t\tValor\n\n");
                     generador_muestras (v, t, cant_muestras,Fun_Exp, t_inicial, t_final, precision);
 
-                    break;}
+                    break;
+                    }
     case Fun_escalon: {
                         printf("\t T\t\tValor\n\n");
                         generador_muestras (v, t, cant_muestras,Fun_escalon, t_inicial, t_final, precision);
 
-                        break;}
+                        break;
+                        }
     case Fun_mrua: {
-                printf("fun 6\n\n") ;
-                break;}
+
+                      generador_muestras (v, t, cant_muestras,Fun_mrua, t_inicial, t_final, precision);
+
+                     break;
+
+                   }
+
     case Fun_phiper: {
                     printf("fun 7\n\n") ;
                     break;
@@ -207,6 +231,7 @@ void generador_muestras (float v[], float t[], int cant_muestras, int fun,float 
   float dato, aux=0;
 
  float AMP, FASE, FREC ;
+ float vel, acel, posicion ;
 
 
 
@@ -221,7 +246,7 @@ for(i=0; i<cant_muestras; i++)
                     case Fun_Senoidal: {  if ( aux==0)
                                               {  //printf( "usted esta a punto de cargar datos seno \n");
                                                  fprintf(stderr,"%s\n\n%s\n\n\n\n",FUNCION_A_MUESTREAR,FUNCION_SENOIDAL);
-                                                 printf("2pi: %f\n", 2*pi) ;
+                                                // printf("2pi: %f\n", 2*pi) ;
 
                                                  AMP= cargar_seno(dato_amp) ;
                                                  FASE= cargar_seno(dato_fase);
@@ -229,29 +254,35 @@ for(i=0; i<cant_muestras; i++)
 
                                                 aux=1 ;
 
+                                                printf("\t T\t\tValor\n\n");
+
                                               } ;
 
 
                                         v[i]= funcion_senoidal(dato, AMP, FASE, FREC) ;
-                                        printf("\t%f\t\t%.*f\n",  t[i], precision, v[i]);
+                                        printf("\t%.*f%20.*f\n",  precision, t[i], precision, v[i]);
                                         break;
                                         }
 
 
                     case Fun_Log:   {
+                                        v[i]= log(dato) ;
+                                        printf("\t%.*f%20.*f\n",  precision, t[i], precision, v[i]);
 
-
-                                    break;
+                                        break;
                                     }
 
                     case Fun_Loglineal: {
+                                            v[i]= dato*log(dato) ;
+                                            printf("\t%.*f%20.*f\n",  precision, t[i], precision, v[i]);
 
-                                        break;}
+                                            break;
+                                        }
 
 
                     case Fun_Exp: {
                                     v[i]= funcion_exponencial(dato);
-                                   printf("\t%f\t\t%.*f\n",  t[i], precision, v[i]);
+                                    printf("\t%.*f%20.*f\n",  precision, t[i], precision, v[i]);
                                     break;
 
                                     }
@@ -259,14 +290,29 @@ for(i=0; i<cant_muestras; i++)
 
                     case Fun_escalon: {
                                         v[i]= funcion_escalon(dato);
-                                        printf("\t%f\t\t%.*f\n",  t[i],precision,  v[i]);
-
+                                        printf("\t%.*f%20.*f\n",  precision, t[i], precision, v[i]);
                                         break;
                                         }
 
-                    case Fun_mrua: {
-                                        printf("fun 6\n\n") ;
+                    case Fun_mrua: {   if ( aux==0)
+                                              {  //printf( "usted esta a punto de cargar datos seno \n");
+                                                 fprintf(stderr,"%s\n\n%s\n\n\n\n",FUNCION_A_MUESTREAR,FUNCION_MRUA);
+
+
+                                                 posicion= cargar_mrua(mrua_x) ;
+                                                 vel= cargar_mrua(mrua_v);
+                                                 acel=cargar_mrua(mrua_a);
+
+                                                aux=1 ;
+
+                                                printf("\t T\t\tValor\n\n");
+
+                                              } ;
+
+                                        v[i]= funcion_mrua(dato, posicion, vel, acel) ;
+                                        printf("\t%.*f%20.*f\n",  precision, t[i], precision, v[i]);
                                         break;
+
 
                                     }
                     case Fun_phiper: {
@@ -379,42 +425,111 @@ switch (datos)
 float funcion_senoidal (float dato, float AMP, float FASE, float FREC)
 
 {
-printf( "dato*2pi frec :  %f\n", dato*2*pi*FREC);
- printf( "seeeeeeeenoo   %f\n", AMP* sin( (dato*2*pi*FREC)+ FASE ));
+//printf( "dato*2pi frec :  %f\n", dato*2*pi*FREC);
+// printf( "seeeeeeeenoo   %f\n", AMP* sin( (dato*2*pi*FREC)+ FASE ));
 return  AMP*sin( dato*2*pi*FREC+ FASE ) ;
 
 
 
 }
 
+/**************   cargar datos mrua ************/
 
-//
+float cargar_mrua (t_mrua dato )
+
+{ float variable;
+  int j;
+
+    switch (dato)
+    {
+        case mrua_x : {
+                         do{
+                                while(getchar()!='\n');
+                                fprintf(stderr,"\n%s",MSJ_MRUA_POS);
+                                j=scanf("%f",&variable);
+                                if( j==0 ){
+                                        fprintf(stderr,"Error: ingreso mal la posicion\n\n");
+                                            }
+                                else  j =1;
+                            }
+                        while( j==0);
+                        return variable;
+                        break;
+                    }
+
+        case mrua_v : {
+                        do{
+                                while(getchar()!='\n');
+                                fprintf(stderr,"\n%s",MSJ_MRUA_VEL);
+                                j=scanf("%f",&variable);
+                                if( j==0 ){
+                                        fprintf(stderr,"Error: ingreso mal la velocidad\n\n");
+                                            }
+                                else  j =1;
+                            }
+                        while( j==0);
+                        return variable;
+                        break;
+                    }
+
+        case mrua_a:  {
+                        do{
+                                while(getchar()!='\n');
+                                fprintf(stderr,"\n%s",MSJ_MRUA_ACEL);
+                                j=scanf("%f",&variable);
+                                if( j==0 ){
+                                        fprintf(stderr,"Error: ingreso mal la aceleracion\n\n");
+                                            }
+                                else  j =1;
+                            }
+                        while( j==0);
+
+                        return variable;
+                        break;
+                       }
 
 
-//
-/*void senoid(double tiempoi, double tiempof, double espacio, int prec){
+        }
 
-        float fase=0;
-        float amp;
-        float frq;                                /*prsn=Parametros seno*/
- /*       float t;
-        float arg;
-
-        printf("%s",MSJ_SEN_FRQ);
-        scanf("%f",&frq);
-
-        printf("%s",MSJ_SEN_AMP);               /*declare variables por separado, los arrays me fallaban siempre*/
- /*       scanf("%f",&amp);
-
-        printf("%s",MSJ_SEN_FAS);
-        scanf("%f",&fase);
-
-        for(t=tiempoi ; t<=tiempof ; t+=espacio){
-
-            arg=sin((2*pi*(frq)*t)+fase);
-            printf("%.*f:	%.*f\n", prec,  t, prec, amp*arg);
-       }
-
-       return;
     }
+
+
+/*************** funcion mrua **************/
+
+
+
+float  funcion_mrua(float dato,float  x,float v,float a)
+{
+
+    return (x+(v*dato+(a)*0.5*(pow(dato,2)))) ;
+
+
+
+
+}
+/*
+void mrua(double tiempoi, double tiempof, double espacio, int prec)
+{
+
+        float x_in, v_in, acel;
+        float tm;
+        float mrua;
+
+        printf("%s",MSJ_MRUA_POS);
+        scanf("%f",&x_in);
+
+        printf("%s",MSJ_MRUA_VEL);
+        scanf("%f",&v_in);
+
+        printf("%s",MSJ_MRUA_ACEL);
+        scanf("%f",&acel);
+
+        for(tm=tiempoi; tm<tiempof; tm+=espacio){
+
+        mrua=((x_in)+(v_in)*tm+(acel)*0.5*(pow(tm,2)));
+
+        printf("%f:%.*f\n",tm, prec, mrua);
+    }
+    return;
+}
 */
