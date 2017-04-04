@@ -1,6 +1,6 @@
 #ifndef es__h
 #define es__h
-#endif // es__h
+#endif 
 
 #define MAX_MUESTRAS  100
 #define pi 3.1416
@@ -46,4 +46,4 @@
 
 #define VALOR_Z       "\n\nIngrese valor de 'z' :  "
 #define VALOR_A       "\n\nIngrese valor de 'a' :  "
-#define VALOR_B       "\n\nIngrese valor de 'b' :  "
+#define VALOR_B "\n\nIngrese valor de 'b' :  "

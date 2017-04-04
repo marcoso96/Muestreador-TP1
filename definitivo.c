@@ -1,9 +1,6 @@
 #include<stdio.h>
 #include<math.h>
 #include<stdlib.h>
-//#include "muestras.h"
-
-
 
 typedef  enum { SALIR=0, INGRESAR} t_bool;
 typedef  enum { Fun_Senoidal= 1, Fun_Log, Fun_Loglineal, Fun_Exp, Fun_escalon, Fun_mrua, Fun_phiper} t_funciones;
@@ -18,7 +15,7 @@ float funcion_senoidal (float dato, float AMP, float FASE, float FREC);
 
 void  cargar_datos_senoidal (float AMP, float FASE, float FREC);
 float cargar_seno (t_parametros datos);
-float cargar_mrua (t_mrua dato ) ;
+float  cargar_mrua (t_mrua dato ) ;
 float cargar_parab ();
 
 float  funcion_mrua(float dato,float  x,float v,float a) ;
@@ -27,20 +24,19 @@ float funcion_phiper(float dato, float a, float b);
 #include "config.h"
 #ifdef Lenguaje_ES
 #include "definitivo_es.h"
-#endif // Lenguaje_ES
+#endif 
 
 int main (void)
 {
 
-  t_bool opcion ;
-  float t_inicial, t_final, base;
-  size_t i;
+  int opcion ;
+  float t_inicial, t_final;
   int j=0;
-  t_funciones opciones;
+  int opciones;
   int repetir=0;
   int cant_muestras, precision;
   float v[MAX_MUESTRAS] , t[MAX_MUESTRAS] ;
-  float AMP, FASE, FREC;
+
 
 
 
@@ -57,7 +53,7 @@ int main (void)
             {
                 fprintf(stderr,"\n%s", MSJ_MENU_ERR);
                 return EXIT_FAILURE;
-            } ;
+            } 	
 
         if (opcion==SALIR)
                 return EXIT_FAILURE ;
@@ -136,7 +132,7 @@ int main (void)
     fprintf(stderr,"%s\n\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n%s\n\n\n", MSJ_MENU_2, MSJ_SENOIDAL,MSJ_LOGARITMICA, MSJ_LOGLINEAL,MSJ_EXPONENCIAL,
         MSJ_ESCALON_HEAVISIDE,MSJ_MRUA,MSJ_PARABOLOIDE_HIPERBOLICO, MSJ_VOLVER);
 
-    scanf("%i", &opciones) ;
+    scanf("%d", &opciones) ;
 
 
     switch (opciones) {
@@ -212,7 +208,6 @@ return EXIT_SUCCESS;
 
 /**************/
 
-//#include "muestras.h"
 
 
 void generador_muestras (float v[], float t[], int cant_muestras, int fun,float t_inicial, float t_final, int precision)
@@ -222,8 +217,7 @@ void generador_muestras (float v[], float t[], int cant_muestras, int fun,float 
 
  float AMP, FASE, FREC ;
  float vel, acel, posicion ;
- float rama_2, a, b , z;
- float var_z;
+ float rama_2, a, b ;
 
 
 
@@ -241,7 +235,7 @@ for(i=0; i<cant_muestras; i++)
 
 
                                                  AMP= cargar_seno(dato_amp) ;
-                                                 FASE= cargar_seno(dato_fase);
+                                                 FASE=cargar_seno(dato_fase);
                                                  FREC=cargar_seno (dato_frec);
 
                                                 aux=1 ;
@@ -341,7 +335,7 @@ for(i=0; i<cant_muestras; i++)
 float funcion_exponencial (float dato)
 {
     return (exp(dato)) ;
-} ;
+} 
 
 
 /*********** funcion partida ************/
@@ -380,7 +374,7 @@ switch (datos)
                                 }
                         while( j==0);
 
-                        return variable;
+                       
                         break;
                         }
 
@@ -398,7 +392,7 @@ switch (datos)
                         while( j==0 ||!(variable<=2*pi) ||   !(variable>=0) );
 
 
-                        return variable;
+                 
                         break;
                         }
 
@@ -413,7 +407,7 @@ switch (datos)
                                 else  j =1;
                             }
                         while( j==0);
-                        return variable;
+                        
                         break;
 
 
@@ -424,7 +418,8 @@ switch (datos)
 
 
        }
-   }
+return variable;
+}
 
 
 
@@ -463,7 +458,7 @@ float cargar_mrua (t_mrua dato )
                             }
                         while( j==0);
 
-                        return variable;
+                    
                         break;
                     }
 
@@ -479,7 +474,7 @@ float cargar_mrua (t_mrua dato )
                                 else  j =1;
                             }
                         while( j==0);
-                        return variable;
+                       
                         break;
                     }
 
@@ -495,14 +490,14 @@ float cargar_mrua (t_mrua dato )
                             }
                         while( j==0);
 
-                        return variable;
+                        
                         break;
                        }
 
 
         }
-
-    }
+return variable;
+}
 
 
 /*************** funcion mrua **************/
@@ -523,7 +518,7 @@ float  funcion_mrua(float dato,float  x,float v,float a)
 float cargar_parab ()
 
 { float z;
-  int j;
+  float j;
 
 
   do{
