@@ -139,7 +139,7 @@ t_stat menu_inicio(void){
 
 }
 
-int leer_stat(){   /* Aca supuestamente la funcion devulve un t_stat, pero dato es un INT!*/
+int leer_stat(){   /* Aca supuestamente la funcion devulve un t_stat, pero dato es un int, no estoy segura de si esto esta mal o bien*/
 	
 	int dato;
 	t_bool j;
@@ -204,7 +204,7 @@ float leer_float(){
 		if((j==FALSE)||(dato<FALSE)){ 
 
 			fprintf(stderr, "\n%s\n", MSJ_MENU_ERRD);
-			/*camb--; Esto deberia ocurrir, porque en men_par lo primero que se hace es cambiar la direccion del vector al siguiente, y si hay un error, deberiamos volver a la 			posicion anterior con esta misma sentencia, pero se me complica con las funciones ya que esta funcion se usa en otras funciones x.x. PEEROO no es tan relevante*/
+			/*camb--; Esto deberia ocurrir, porque en men_par lo primero que se hace es cambiar la direccion del elemto al que apunta en enum, al siguiente, y si hay un error, deberiamos volver a la posicion anterior con esta misma sentencia, pero se me complica con las funciones ya que esta funcion se usa en otras funciones x.x. PEEROO no es tan relevante*/
 			}
 		else {j=TRUE;}
 	}
@@ -228,7 +228,7 @@ t_funciones menu_funcion(void){
 	return leer_func();		
 }
 
-int leer_func(){ /** aca otra vez tenemos la cosa de que tenemos t_funciones y dato es un int*/
+int leer_func(){ /* aca cambie t_funciones por int, porque dato es un int*/
 	
 	int dato;
 	t_bool j;
