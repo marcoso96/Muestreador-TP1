@@ -65,7 +65,7 @@ int main(void){
 								tiempof=men_par(param, camb);
                 
 								printf("\n%s\n",MSJ_CANT_MUESTRAS);	
-								cant_muestras=(int)men_par(param, camb);
+/*Esto deberia ser una funcion :/ */				cant_muestras=(int)men_par(param, camb);
                 
 								printf("\n%s\n", MSJ_PRECISION);	
 								precision=(int)men_par(param,camb);
