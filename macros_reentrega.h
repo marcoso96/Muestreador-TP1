@@ -11,6 +11,7 @@
 #define IND_PARAB 7
 #define IND_VOLVER 0
 
+#define MSJ_SALIDA "ADIOS!"
 #define MSJ_FUNCION "Funcion"
 #define MSJ_T_FINAL      "Tiempo final: "
 #define MSJ_T_INICIAL    "Tiempo inicial: "
@@ -44,18 +45,18 @@
 #define MSJ_FASE      "Fase en radianes (Considerando un rango de 0 a 2*pi, (pi=3.1416): "
 #define MSJ_FRECUENCIA  "Frecuencia: "
 
-#define TABLA_XY "\t T\t\tValor\n\n"
+#define TABLA_XY "t|f(t)\n\n"
 #define MSJ_MRUA_POS "\nIngrese la posicion inicial: "
 #define MSJ_MRUA_VEL "\nIngrese la velocidad inicial: "
 #define MSJ_MRUA_ACEL "\nIngrese la aceleracion: "
 
 #define MSJ_VALOR        "Ingresar el valor:  "
 
-#define MSJ_CONS_A       "\n\nIngrese valor de 'a' :  "
-#define MSJ_CONS_B       "\n\nIngrese valor de 'b' :  "
+#define MSJ_CONS_A       "Ingrese valor de 'a' :  "
+#define MSJ_CONS_B       "Ingrese valor de 'b' :  "
 #define MSJ_MENU         "Seleccione lo que desea hacer:  "
 
-#define MSJ_MENU_OPC0     "1."
-#define MSJ_MENU_OPC1	  "0."	
+#define MSJ_MENU_OPC1     "1."
+#define MSJ_MENU_OPC0	  "0."	
 
 #endif 
