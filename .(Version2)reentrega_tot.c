@@ -315,7 +315,7 @@ t_stat funciones (float tiempoi, float tiempof, int cant_muestras, t_funciones f
 				}
 								
 	
-	return INICIO; /*riginalmente retornaba INICIO pero no se lo asignas a nada, por eso una vez terminado stat sigue siendo igual a func y no vuelve a pedir los parametros!*/
+	return INICIO;
 
 }
 
