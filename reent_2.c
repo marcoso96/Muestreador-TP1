@@ -18,10 +18,6 @@ typedef enum {FALSE, TRUE} t_bool;
 typedef enum {OK, ERR_DAT, ERR_OPC_FUN, ERR_OPC_PPAL} ;
 typedef enum {CANT_CERO, CANT_UNO, CANT_DOS} t_cantidad; /*agregue cant para no hardcodear en la linea 76, 77 ,78*/
 
-
-float leer_float(void);
-void limpiar_buffer(void);
-
 void f_log(float tiempoi,float tiempof, int prec,int cant_muestras);
 void f_loglin(float tiempoi,float tiempof, int prec,int cant_muestras);
 void f_escalon(float tiempoi,float tiempof, int prec,int cant_muestras);
@@ -30,18 +26,22 @@ void f_par_hip(float tiempoi,float tiempof,float a,float b,int prec,int cant_mue
 void f_mrua(float tiempoi,float tiempof,float pos,float vel,float acel,int prec,int cant_muestras);
 void f_exp(float tiempoi,float tiempof, int prec,int cant_muestras);
 
-int leer_func(void);
-t_funciones menu_funcion(void);
+float leer_float(void);
+int   leer_int (void);
 
-int leer_int(void);
+int leer_func(void);
 int leer_stat(void);
 
+void limpiar_buffer(void);
+
+t_funciones menu_funcion(void);
 t_stat menu_inicio(void);
 t_stat funciones (float tiempoi, float tiempof, int cant_muestras, t_funciones func, int prec);
 
 float men_par(t_parametros param, t_parametros *camb);
 
-int main(void){
+
+int main (void) {
 	
 	t_status status;
 	t_stat stat=INICIO;
@@ -126,13 +126,10 @@ int main(void){
 
 t_stat menu_inicio(void){
 
-	t_stat stat;
 
 	fprintf(stderr,"\n%s\n\n%s\t%s\n%s\t%s\n\n\n", MSJ_MENU, MSJ_MENU_OPC1, MSJ_MUESTREAR, MSJ_MENU_OPC0, MSJ_SALIR );
 
-	stat=leer_stat();
-
-	return stat;
+	return leer_stat() ;
 
 }
 
@@ -199,13 +196,12 @@ int leer_int (void) {
 
 		limpiar_buffer();
 
-		j=scanf("%d", &dato);
-
-		if((j==FALSE)){
-
+		if(scanf("%d", &dato)){
+			
+			j=FALSE;
 			fprintf(stderr, "\n%s:%s\n", MSJ_MENU_ERR, MSJ_MENU_ERRD);
 			}
-		else {j=TRUE;}
+		else j=TRUE;
 	}
 
 	while(j==FALSE);
@@ -221,13 +217,13 @@ float leer_float (void) {
 
 		limpiar_buffer();
 
-		j=scanf("%f", &dato);
-
-		if((j==FALSE)){
+		if(!scanf("%f", &dato)){
 
 			fprintf(stderr, "\n%s:%s\n", MSJ_MENU_ERR, MSJ_MENU_ERRD);
+			j=FALSE;
 			}
-		else {j=TRUE;}
+		else  j=TRUE;
+		     
 	}
 
 	while(j==FALSE);
@@ -428,7 +424,7 @@ void f_loglin(float tiempoi,float tiempof, int prec,int cant_muestras){
 
 	float t;
 
-	fprintf(stderr,"%s\n\n%s\n\n%s",MSJ_FUNCION, MSJ_LOGLINEAL,MSJ_TABLA_XY);
+	fprintf(stderr,"%s\n\n%s\n\n%s",  MSJ_FUNCION, MSJ_LOGLINEAL,MSJ_TABLA_XY);
 
 	for(t=tiempoi;  t<tiempof;   t+=((tiempof-tiempoi)/(float)cant_muestras)){
 
