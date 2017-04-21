@@ -15,7 +15,7 @@ typedef enum {F_SENOIDAL=IND_SEN, F_LOG=IND_LOG, F_LOGLINEAL=IND_LOGLIN,
 typedef enum {SALIR, PARAM, ERR_OPC_PPAL, INICIO, ERR_OPC_FUN, ERR_DAT, FUNC} t_stat;
 typedef enum {TIEMPOI, TIEMPOF, CANT_MUESTRAS, PRECISION} t_parametros;
 typedef enum {FALSE, TRUE} t_bool;
-typedef enum {OK, ERR_DAT, ERR_OPC_FUN, ERR_OPC_PPAL} ;
+typedef enum {OK, ERR_DAT, ERR_OPC_FUN, ERR_OPC_PPAL} ; /* no deberia tener el nombre del enum? */
 typedef enum {CANT_CERO, CANT_UNO, CANT_DOS} t_cantidad; /*agregue cant para no hardcodear en la linea 76, 77 ,78*/
 
 void f_log(float tiempoi,float tiempof, int prec,int cant_muestras);
