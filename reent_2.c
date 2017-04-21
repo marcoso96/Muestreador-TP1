@@ -15,8 +15,11 @@ typedef enum {F_SENOIDAL=IND_SEN, F_LOG=IND_LOG, F_LOGLINEAL=IND_LOGLIN,
 typedef enum {SALIR, PARAM, ERR_OPC_PPAL, INICIO, ERR_OPC_FUN, ERR_DAT, FUNC} t_stat;
 typedef enum {TIEMPOI, TIEMPOF, CANT_MUESTRAS, PRECISION} t_parametros;
 typedef enum {FALSE, TRUE} t_bool;
-typedef enum {OK, ERR_DAT, ERR_OPC_FUN, ERR_OPC_PPAL}
-float leer_float();
+typedef enum {OK, ERR_DAT, ERR_OPC_FUN, ERR_OPC_PPAL} ;
+typedef enum {CANT_CERO, CANT_UNO, CANT_DOS} t_cantidad; /*agregue cant para no hardcodear en la linea 76, 77 ,78*/
+
+
+float leer_float(void);
 void limpiar_buffer(void);
 
 void f_log(float tiempoi,float tiempof, int prec,int cant_muestras);
@@ -30,7 +33,7 @@ void f_exp(float tiempoi,float tiempof, int prec,int cant_muestras);
 int leer_func(void);
 t_funciones menu_funcion(void);
 
-int leer_int();
+int leer_int(void);
 int leer_stat(void);
 
 t_stat menu_inicio(void);
@@ -52,7 +55,7 @@ int main(void){
 
 	while(1){
 
-			switch (stat){.
+			switch (stat){
 
 					case INICIO:
 
@@ -66,13 +69,13 @@ int main(void){
 
 								tiempof=leer_double();
 
-                                cant_muestras=leer_int();
+                                				cant_muestras=leer_int();
 
 								precision=leer_int();
 
-								if(tiempoi>tiempof||precision<0||
-								cant_muestras%((int)cant_muestras!=1)||
-								cant_muestras<=0){
+								if(tiempoi>tiempof||precision< CANT_CERO||
+								cant_muestras%((int)cant_muestras!= CANT_UNO)||
+								cant_muestras<= CANT_CERO){
 
 									status=ERR_DAT;
 									param=TIEMPOI;
@@ -118,7 +121,7 @@ int main(void){
 								break;
 			}
 	}
-	return 0;
+	return EXIT_SUCESS;
 }
 
 t_stat menu_inicio(void){
@@ -133,17 +136,16 @@ t_stat menu_inicio(void){
 
 }
 
-int leer_stat(){
+int leer_stat(void){
 
 	int dato;
 	t_bool j;
 
 	do{
 
-		j=scanf("%d", &dato);
-
-		if(j==FALSE) {
-
+		if(!scanf("%d", &dato)) {
+			
+			j=FALSE; 
 			fprintf(stderr, "\n%s:%s\n", MSJ_MENU_ERR, MSJ_MENU_ERRD);
 			limpiar_buffer();
 			}
@@ -186,10 +188,10 @@ float men_par(t_parametros param, t_parametros *camb){
 						return (float)leer_int();
 						break;
 		}
-return 0;
+return EXIT_SUCESS;
 }
 
-int leer_int(){
+int leer_int (void) {
 
 	int dato;
 	t_bool j;
@@ -211,7 +213,7 @@ int leer_int(){
 	return dato;
 }
 
-float leer_float(){
+float leer_float (void) {
 
 	float dato;
 	t_bool j;
@@ -247,7 +249,7 @@ t_funciones menu_funcion(void){
 	return leer_func();
 }
 
-int leer_func(){
+int leer_func(void){
 
 	int dato;
 	t_bool j;
@@ -256,11 +258,12 @@ int leer_func(){
 
 		limpiar_buffer();
 
-		j=scanf("%d", &dato);
 
-		if(j==FALSE||dato<FALSE)
+		if( !scanf("%d", &dato) || dato<FALSE) {
 
 			fprintf(stderr, "\n%s:%s\n", MSJ_MENU_ERR, MSJ_MENU_ERRD);
+			j=FALSE;
+		        }
 
 		else j=TRUE;
 	}
@@ -312,7 +315,7 @@ t_stat funciones (float tiempoi, float tiempof, int cant_muestras, t_funciones f
 
 
 
-							break;
+								break;
 
 				case F_MRUA:
 
@@ -360,7 +363,6 @@ void f_par_hip(float tiempoi,float tiempof,float a,float b,int prec,int cant_mue
 			fprintf(stderr, "\n%.*f\t|%.*f", prec, t, prec, parh);
 	}
 
-	return;
 }
 
 
@@ -377,7 +379,7 @@ void f_escalon(float tiempoi,float tiempof, int prec,int cant_muestras){
 		fprintf(stderr, "\n%.*f\t|%d", prec, t,(t>0)?1:0);
 	}
 
-	return;
+	
 }
 
 
@@ -404,7 +406,7 @@ void f_mrua(float tiempoi,float tiempof,float pos,float vel,float acel,int prec,
 			fprintf(stderr,"\n%.*f\t|%.*f", prec, t, prec, posicion_final);
 		}
 
-	return;
+	
 }
 
 void f_exp(float tiempoi,float tiempof, int prec,int cant_muestras){
@@ -418,7 +420,7 @@ void f_exp(float tiempoi,float tiempof, int prec,int cant_muestras){
 			fprintf(stderr, "\n%.*f\t|%.*f", prec, t, prec, exp(t));
 	}
 
-	return;
+	
 }
 
 
@@ -428,12 +430,12 @@ void f_loglin(float tiempoi,float tiempof, int prec,int cant_muestras){
 
 	fprintf(stderr,"%s\n\n%s\n\n%s",MSJ_FUNCION, MSJ_LOGLINEAL,MSJ_TABLA_XY);
 
-	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/(float)cant_muestras)){
+	for(t=tiempoi;  t<tiempof;   t+=((tiempof-tiempoi)/(float)cant_muestras)){
 
 			fprintf(stderr, "\n%.*f\t|%.*f", prec, t, prec, t*log(t));
 	}
 
-	return;
+	
 }
 
 void f_log(float tiempoi,float tiempof, int prec,int cant_muestras){
@@ -447,7 +449,7 @@ void f_log(float tiempoi,float tiempof, int prec,int cant_muestras){
 			fprintf(stderr, "\n%.*f\t|%.*f", prec, t, prec, log(t));
 	}
 
-	return;
+	
 }
 
 
@@ -474,7 +476,7 @@ void f_senoidal(float tiempoi, float tiempof, float fase, float amp, float frec,
 
 		}
 
-	return;
+
 
 }
 
@@ -483,6 +485,6 @@ void limpiar_buffer(void){
 
 	while(getchar()!='\n');
 
-	return;
+	
 }
 
