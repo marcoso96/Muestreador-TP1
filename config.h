@@ -1,1 +1,3 @@
-#define Lenguaje_ES
+#ifndef CONFIG__H
+#define LENGUAJE_ES
+#endif
