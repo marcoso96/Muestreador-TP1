@@ -12,3 +12,4 @@
 
 #define MIN_PREC 0
 #define MIN_CANTIDAD_MUESTRAS 0
+#define MAX_CANT_INTENTOS 3
