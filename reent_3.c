@@ -166,7 +166,7 @@ void menu_inicio(void){
 
 }
 
-int leer_int (void) {
+int leer_int (void) {    /* la volvi a dejar como estaba con mis modificaciones de ayer*/
 
 	int dato;
 	t_bool j;
@@ -174,7 +174,7 @@ int leer_int (void) {
 
 		limpiar_buffer();
 
-		if(scanf("%d", &dato)){
+		if(!scanf("%d", &dato) ) {
 
 			j=FALSE;
 
