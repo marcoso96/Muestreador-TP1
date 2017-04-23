@@ -214,14 +214,14 @@ double leer_double (void) {
 void menu_funcion(void){
 
 	fprintf(stderr,"%s\n\n%d\\%s:\n%d\\%s:\n%d\\%s:\n%d\\%s:\n%d\\%s:\n%d\\%s:\n%d\\%s:\n%d\\%s:\n\n", MSJ_MENU_2,
-		IND_SEN, MSJ_SENOIDAL,
-		IND_LOG,MSJ_LOGARITMICA,
-		IND_LOGLIN, MSJ_LOGLINEAL,
-		IND_EXP, MSJ_EXPONENCIAL,
-        IND_ESC, MSJ_ESCALON,
-        IND_MRUA, MSJ_MRUA,
-        IND_PARAB, MSJ_PARAB,
-        IND_VOLVER, MSJ_VOLVER);
+		INDICE_SEN, MSJ_SENOIDAL,
+		INDICE_LOG,MSJ_LOGARITMICA,
+		INDICE_LOGLIN, MSJ_LOGLINEAL,
+		INDICE_EXP, MSJ_EXPONENCIAL,
+        	INDICE_ESC, MSJ_ESCALON,
+        	INDICE_MRUA, MSJ_MRUA,
+        	INDICE_PARAB, MSJ_PARAB,
+        	INDICE_VOLVER, MSJ_VOLVER);
 
     return;
 }
