@@ -13,6 +13,7 @@
 #define MSJ_ERROR "Error"
 #define MSJ_ERROR_OPC "Ingreso mal la opcion"
 #define MSJ_ERROR_DATO "Ingreso mal el dato"
+#define MSJ_ERROR_CANTMAX_INTENTOS "Supero la cantidad de intentos posibles para ingresar datos"
 #define MSJ_MUESTREAR    "Muestrear una funcion predefinida"
 #define MSJ_SALIR        "Salir "
 #define MSJ_SENOIDAL        "Senoidal "
