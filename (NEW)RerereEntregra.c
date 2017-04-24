@@ -182,28 +182,34 @@ void menu_inicio(void){
 
 }
 
-int leer_int (void) {    /* la volvi a dejar como estaba con mis modificaciones de ayer*/
+ 
+int leer_int (void) {    /* lo modifique..deberia andar pero no va bien...*/
 
-	int dato;
-	t_bool j;
-	do{
+	int dato, j;
 
-		limpiar_buffer();
+	size_t cant_intentos =0;
 
-		if(!scanf("%d", &dato) ) {
+	do{    
 
-			j=FALSE;
+        	if ( !scanf("%d",&dato))  {  
+        
+			   		fprintf(stderr, "\n%s:%s\n", "MSJ_ERROR", "MSJ_ERROR_OPC");
 
-			fprintf(stderr, "\n%s:%s\n", MSJ_ERROR, MSJ_ERROR_OPC);
+            				cant_intentos++ ;
+					limpiar_buffer();
+						}
 
-			}
-		else j=TRUE;
+        	else return dato;
+
+
 	}
 
-	while(j==FALSE);
+	while( cant_intentos <=MAX_CANT_INTENTOS);
 
-	return dato;
+	if (cant_intentos ==MAX_CANT_INTENTOS) return EXIT_FAILURE;
 }
+
+
 
 double leer_double (void) {
 
