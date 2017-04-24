@@ -287,7 +287,7 @@ t_stat funciones (float tiempoi, float tiempof, int cant_muestras, t_funciones f
 
 				default:		
 								opcfuncion_es_erroneo=TRUE;
-								return ST_ERROR;     /*PROBLEMA: stat_programa=ST_ERROR y luego stat_ejecucion=OK, que es el estado que quedo de antes. Tenemos que cambiar ese estado de alguna manera ;/ */
+								return ST_ERROR;   
 
 				}
 
