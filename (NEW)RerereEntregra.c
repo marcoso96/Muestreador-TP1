@@ -211,25 +211,33 @@ int leer_int (void) {    /* lo modifique..deberia andar pero no va bien...*/
 
 
 
-double leer_double (void) {
+double leer_double (void) {  /*modifique esta f uncion tmb quedo igual a la de int*/
 
-	double dato;
-	t_bool j;
+	int dato, j;
 
-    if(i>=1) {limpiar_buffer();}
+	size_t cant_intentos =0;
 
-    if(!scanf("%f", &dato)){         
+	do{    
 
-        fprintf(stderr, "\n%s:%s\n", MSJ_ERROR, MSJ_ERROR_DATO);
+        	if ( !scanf("%g",&dato))  {  
+        
+			   		fprintf(stderr, "\n%s:%s\n", "MSJ_ERROR", "MSJ_ERROR_OPC");
 
-			}
+            				cant_intentos++ ;
+					limpiar_buffer();
+						}
 
-    else  j=TRUE;
+        	else return dato;
 
-	while(j==0);
 
-	return dato;    /* pedazo incompleto*/ /*supuse que es como leer_int */
+	}
+
+	while( cant_intentos <=MAX_CANT_INTENTOS);
+
+	if (cant_intentos ==MAX_CANT_INTENTOS) return EXIT_FAILURE;
 }
+
+
 
 void menu_funcion(void){
 
