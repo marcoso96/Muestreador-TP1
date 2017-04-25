@@ -1,49 +1,47 @@
-/*PROGRAMA MUESTREADOR*/
-
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
 
 #include "constantes.h"
 #include "config.h"
+
 #ifdef LENGUAJE_ES
-#include "macros_reent_3.h"
+#include "macros_reent3.h"
 #endif
 
 typedef enum {F_SENOIDAL=INDICE_SEN, F_LOG=INDICE_LOG, F_LOGLINEAL=INDICE_LOGLIN,
 	F_EXPONENCIAL=INDICE_EXP, F_ESCALON=INDICE_ESC, F_MRUA=INDICE_MRUA,
 	F_PAR_HIP=INDICE_PARAB, F_VOLVER=INDICE_VOLVER} t_funciones;
-typedef enum {ST_SALIR, ST_PARAM, ST_INICIO, ST_ERROR, ST_FUNC} t_stat;
-typedef enum {FALSE, TRUE} t_bool;
-typedef enum {OK, ERR_DAT, ERR_OPC_FUN, ERR_OPC_PPAL} t_err; /* no deberia tener el nombre del enum? */
+typedef enum {ST_SALIR, ST_PARAM, ST_INICIO, ST_FUNCION} t_stat;
+typedef enum {OK, ERR_DATO, ERR_OPC_FUN, ERR_OPC_PPAL} t_err; 
 typedef enum {OPC_SALIR, OPC_FUNCION} t_menu_ppal;
 
-void f_log(float tiempoi,float tiempof, int prec,int cant_muestras);
-void f_loglin(float tiempoi,float tiempof, int prec,int cant_muestras);
-void f_escalon(float tiempoi,float tiempof, int prec,int cant_muestras);
-void f_senoidal(float tiempoi, float tiempof, int prec, int cant_muestras);
-void f_par_hip(float tiempoi,float tiempof,float a,float b,int prec,int cant_muestras);
-void f_mrua(float tiempoi,float tiempof,float pos,float vel,float acel,int prec,int cant_muestras);
-void f_exp(float tiempoi,float tiempof, int prec,int cant_muestras);
+void f_logaritmica(double tiempoi,double tiempof, int prec,int cant_muestras);
+void f_loglineal(double tiempoi,double tiempof, int prec,int cant_muestras);
+void f_escalon(double tiempoi,double tiempof, int prec,int cant_muestras);
+void f_senoidal(double tiempoi,double tiempof, int prec,int cant_muestras);
+void f_paraboloide_hiperbolico(double tiempoi,double tiempof, int prec,int cant_muestras);
+void f_mrua(double tiempoi,double tiempof, int prec,int cant_muestras);
+void f_exponencial(double tiempoi,double tiempof, int prec,int cant_muestras);
 
-double leer_double (void);
-int   leer_int (void);
+t_err leer_double (double *dato);
+t_err leer_int (int *dato);
 
-int leer_func(void);
-int leer_stat(void);
-
+t_err leer_funcion(t_funciones *funcion);
+t_err leer_opcion(t_menu_ppal *opcion);
 void limpiar_buffer(void);
 
 void menu_funcion(void);
 void menu_inicio(void);
-t_stat funciones (float tiempoi, float tiempof, int cant_muestras, t_funciones func, int prec);
+t_stat funciones (float tiempoi, float tiempof, int cant_muestras, t_funciones funcion, int prec);
+void procesar_error(t_err stat_ejecucion);
 
 int main (void) {
 
-	t_err status;
-	t_stat stat=ST_INICIO;
+	t_err stat_ejecucion;
+	t_stat stat_programa = ST_INICIO;
 	t_menu_ppal opcion;
-	t_funciones func;
+	t_funciones funcion;
 
 	float tiempoi;
 	float tiempof;
@@ -52,111 +50,134 @@ int main (void) {
 
 	while(1){
 
-			switch (stat){
+		switch (stat_programa){
 
-					case ST_INICIO:
+				case ST_INICIO:
 
-								menu_inicio();
-                                scanf("%i", &opcion);
+					menu_inicio();
+					stat_programa=leer_opcion(&opcion);
 
-                                switch(opcion){
+					switch(opcion){
 
-                                            case OPC_FUNCION:
+							case OPC_FUNCION:
 
-                                                        status=OK;
-                                                        stat=ST_PARAM;
-                                                        break;
+									stat_ejecucion=OK;
+									stat_programa=ST_PARAM;
+									break;
 
-                                            case OPC_SALIR:
+							case OPC_SALIR:
+									
+									stat_ejecucion=OK;
+									stat_programa=ST_SALIR;
+									break;
 
-                                                        status=OK;
-                                                        stat=ST_SALIR;
-                                                        break;
+							default:
+									stat_ejecucion=ERR_OPC_PPAL;											
+									break;									
+					}				
+					
+					if(stat_ejecucion!=OK){
+							procesar_error(stat_ejecucion);
+							return EXIT_FAILURE;
+					}
+					
+					stat_programa=ST_PARAM;
+					
+					break;
+							
+				case ST_PARAM:
 
-                                            default:
-                                                        stat=ST_ERROR;
-                                                        status=ERR_OPC_PPAL;
-                                                        break;
-                                            }
+					fprintf(stderr, "\n%s\n", MSJ_INGRESO_PARAMETROS);
 
-					case ST_PARAM:
+					fprintf(stderr, "\n%s\n", MSJ_T_INICIAL);
+					stat_ejecucion=leer_double(&tiempoi);
+					procesar_error(stat_ejecucion);
 
-                                fprintf(stderr, "\n%s\n", MSJ_INGRESO_PARAMETROS);
+					fprintf(stderr, "\n%s\n", MSJ_T_FINAL);
+					stat_ejecucion=leer_double(&tiempof);
+					procesar_error(stat_ejecucion);
 
-								fprintf(stderr, "\n%s\n", MSJ_T_INICIAL);
-								tiempoi=leer_double();
+					fprintf(stderr, "\n%s\n", MSJ_CANT_MUESTRAS);
+					stat_ejecucion=leer_int(&cant_muestras);
+					procesar_error(stat_ejecucion);
 
+					fprintf(stderr, "\n%s\n", MSJ_PRECISION);
+					stat_ejecucion=leer_int(&precision);
+					procesar_error(stat_ejecucion);
 
-								fprintf(stderr, "\n%s\n", MSJ_T_FINAL);
-								tiempof=leer_double();
+					
+					if(tiempoi>tiempof||precision< MIN_PREC||
+					   cant_muestras<=MIN_CANTIDAD_MUESTRAS) {
+	
+						stat_programa=ERR_DATO;
+					}
+					
+					procesar_error(stat_ejecucion);
 
+					stat_programa=ST_FUNCION;
+					
+					break;
 
-								fprintf(stderr, "\n%s\n", MSJ_CANT_MUESTRAS);
-                                cant_muestras=leer_int();
+				case ST_FUNCION:
 
-                                fprintf(stderr, "\n%s\n", MSJ_PRECISION);
-								precision=leer_int();
+					menu_funcion();
 
-								if(tiempoi>tiempof||precision< MIN_PREC||
-								cant_muestras<=MIN_CANTIDAD_MUESTRAS){
+					stat_ejecucion=leer_funcion(&funcion);
+					
+					procesar_error(stat_ejecucion);
+					
+					stat_ejecucion=funciones(tiempoi, tiempof, cant_muestras, funcion, precision);
 
-                                    stat=ST_ERROR;
-									status=ERR_DAT;
-								}
+					procesar_error(stat_ejecucion);
+					
+					stat_programa=ST_INICIO;
+					
+					break;
 
-                                status=OK;
-								stat=ST_FUNC;
+				case ST_SALIR:
 
-								break;
+					fprintf(stderr, "\n%s\n", MSJ_SALIDA);
+					return EXIT_SUCCESS;
 
-                    case ST_ERROR:
-								switch(status){
-
-										case OK:
-												break;
-
-										case ERR_DAT:
-
-										    fprintf(stderr,"\n%s:%s\n", MSJ_ERROR, MSJ_ERROR_DATO);
-										    return EXIT_FAILURE;
-										    break;
-
-										case ERR_OPC_FUN:
-
-										    fprintf(stderr,"\n%s:%s\n", MSJ_ERROR, MSJ_ERROR_OPC);
-										    stat=ST_FUNC;
-										    break;
-
-										case ERR_OPC_PPAL:
-
-										    fprintf(stderr,"\n%s:%s\n", MSJ_ERROR, MSJ_ERROR_OPC);
-										    stat=ST_INICIO;
-										    break;
-								}
-
-					case ST_FUNC:
-
-								menu_funcion();
-
-								scanf("%i", &func);
-
-								stat=funciones(tiempoi, tiempof, cant_muestras, func, precision);
-
-                                if(stat==ST_ERROR) status=ERR_OPC_FUN;
-
-                                status=OK;
-
-                                break;
-
-					case ST_SALIR:
-
-								fprintf(stderr, "\n%s\n", MSJ_SALIDA);
-								return EXIT_SUCCESS;
-
-								break;
-			}
+					break;
+		}
 	}
 }
+
+void procesar_error(t_err stat_ejecucion){
+
+			switch(stat_ejecucion){
+
+					case OK:
+					
+							break;
+
+					case ERR_DATO:
+
+						fprintf(stderr,"\n%s:%s\n", MSJ_ERROR, MSJ_ERROR_DATO);
+						
+						return EXIT_FAILURE;
+						
+						break;
+
+					case ERR_OPC_FUN:
+
+						fprintf(stderr,"\n%s:%s\n", MSJ_ERROR, MSJ_ERROR_OPC);
+						
+						return EXIT_FAILURE;
+						
+						break;
+
+					case ERR_OPC_PPAL:
+
+						fprintf(stderr,"\n%s:%s\n", MSJ_ERROR, MSJ_ERROR_OPC);
+						
+						return EXIT_FAILURE;
+						
+						break;
+			}
+}
+
 
 void menu_inicio(void){
 
@@ -166,49 +187,33 @@ void menu_inicio(void){
 
 }
 
-int leer_int (void) {    /* la volvi a dejar como estaba con mis modificaciones de ayer*/
-
-	int dato;
-	t_bool j;
-	do{
-
-		limpiar_buffer();
-
-		if(!scanf("%d", &dato) ) {
-
-			j=FALSE;
-
-			fprintf(stderr, "\n%s:%s\n", MSJ_ERROR, MSJ_ERROR_OPC);
-
-			}
-		else j=TRUE;
-	}
-
-	while(j==FALSE);
-
-	return dato;
+t_err leer_opcion (t_menu_ppal *dato) {   
+		
+	if((scanf("%d", dato))!=CANT_ELEMENTO) return ERR_DATO;
+	
+	else return OK;
 }
 
-double leer_double (void) {
+t_err leer_funcion (t_funciones *dato) {   
+		
+	if(scanf("%d", dato)!=CANT_ELEMENTO) return ERR_DATO;
+	
+	else return OK;
+}
 
-	double dato;
-	int j;
+ 
+t_err leer_int (int *dato) {   
+		
+	if(scanf("%d", dato)!=CANT_ELEMENTO) return ERR_DATO;
+	
+	else return OK;
+}
 
-    if(i>=1) limpiar_buffer();
-
-    if(scanf("%f", &dato)!=){
-
-        fprintf(stderr, "\n%s:%s\n", MSJ_MENU_ERR, MSJ_MENU_ERRD);
-
-			}
-
-    else  j=TRUE;
-
-	}
-
-	while(j==0);
-
-	return dato;
+t_err leer_double (double *dato){
+	
+	if(scanf("%f", dato)!=CANT_ELEMENTO) return ERR_DATO;
+	
+	else return OK;
 }
 
 void menu_funcion(void){
@@ -218,95 +223,85 @@ void menu_funcion(void){
 		INDICE_LOG,MSJ_LOGARITMICA,
 		INDICE_LOGLIN, MSJ_LOGLINEAL,
 		INDICE_EXP, MSJ_EXPONENCIAL,
-        	INDICE_ESC, MSJ_ESCALON,
-        	INDICE_MRUA, MSJ_MRUA,
-        	INDICE_PARAB, MSJ_PARAB,
-        	INDICE_VOLVER, MSJ_VOLVER);
-
-    return;
+        INDICE_ESC, MSJ_ESCALON,
+        INDICE_MRUA, MSJ_MRUA,
+        INDICE_PARAB, MSJ_PARAB,
+        INDICE_VOLVER, MSJ_VOLVER);
 }
 
-t_stat funciones (float tiempoi, float tiempof, int cant_muestras, t_funciones func, int prec){
+t_stat funciones (float tiempoi, float tiempof, int cant_muestras, t_funciones funcion, int prec){
+	
+	switch (funcion){
 
-    switch (func){
+			case F_SENOIDAL:
 
-				case F_SENOIDAL:
+							f_senoidal(tiempoi, tiempof, prec, cant_muestras);
+							break;
 
-								f_senoidal(tiempoi, tiempof, prec, cant_muestras);
+			case F_LOG:
 
-								break;
+							f_log(tiempoi, tiempof, prec, cant_muestras);
+							break;
 
+			case F_LOGLINEAL:
 
-				case F_LOG:
+							f_loglin(tiempoi, tiempof, prec, cant_muestras);
+							break;
 
-								f_log(tiempoi, tiempof, prec, cant_muestras);
+			case F_EXPONENCIAL:
 
-								break;
+							f_exp(tiempoi, tiempof, prec, cant_muestras);
+							break;
 
+			case F_ESCALON:
 
+							f_escalon(tiempoi, tiempof, prec, cant_muestras);
+							break;
 
-				case F_LOGLINEAL:
+			case F_MRUA:
 
-								f_loglin(tiempoi, tiempof, prec, cant_muestras);
+							f_mrua(tiempoi, tiempof, prec, cant_muestras);
+							break;
 
-								break;
+			case F_PAR_HIP:
 
+							f_par_hip(tiempoi, tiempof, prec, cant_muestras);
+							
+							
+							break;
 
-
-				case F_EXPONENCIAL:
-
-								f_exp(tiempoi, tiempof, prec, cant_muestras);
-
-								break;
-
-				case F_ESCALON:
-
-								f_escalon(tiempoi, tiempof, prec, cant_muestras);
-
-
-
-								break;
-
-				case F_MRUA:
-
-								f_mrua(tiempoi, tiempof, prec, cant_muestras);
-
-								break;
-
-				case F_PAR_HIP:
-
-								f_par_hip(tiempoi, tiempof, a, b, prec, cant_muestras);
-
-								break;
-
-				case F_VOLVER:
-								return ST_SALIR;
-
-
-				default:
-								return ST_ERROR;
-
+			case F_VOLVER:
+							return ST_SALIR;
+							
+			default:		
+							opcfuncion_es_erroneo=TRUE;
+							return ST_ERROR;   
+							
 				}
 
+	if(opcfuncion_es_erroneo=FALSE){
 
 	return ST_INICIO;
+	}
 
 }
 
-void f_par_hip(float tiempoi,float tiempof,float a,float b,int prec,int cant_muestras){
+void f_paraboloide_hiperbolico(double tiempoi,double tiempof, int prec,int cant_muestras){
 
-	float parh;
-	float t;
-
+	double parh;
+	double t;
+	double a,b;
+	t_err stat_ejecucion;
+	
 	fprintf(stderr,"%s\n\n%s:\n\n",MSJ_FUNCION, MSJ_CONS_A);
-	a=leer_float();
+	stat_ejecucion=leer_double(&a);
 
 	fprintf(stderr,"%s\n\n%s:\n\n",MSJ_FUNCION, MSJ_CONS_B);
-	b=leer_float();
+	stat_ejecucion=leer_double(&b);
 
 	fprintf(stderr,"%s\n\n%s\n\n%s",MSJ_FUNCION, MSJ_PARAB, ENCABEZADO_XY);
 
-	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/(float)cant_muestras)){
+	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/cant_muestras)){
 
 			parh=((t/a)*(t/a))-((t/b)*(t/b));
 
@@ -317,13 +312,13 @@ void f_par_hip(float tiempoi,float tiempof,float a,float b,int prec,int cant_mue
 
 
 
-void f_escalon(float tiempoi,float tiempof, int prec,int cant_muestras){
+void f_escalon(double tiempoi,double tiempof, int prec,int cant_muestras){
 
-	float t;
+	double t;
 
 	fprintf(stderr,"%s\n\n%s\n\n\n%s",MSJ_FUNCION, MSJ_ESCALON, ENCABEZADO_XY);
 
-	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/(float)cant_muestras)){
+	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/cant_muestras)){
 
 
 		fprintf(stderr, "\n%.*f\t|%d", prec, t,(t>0)?1:0);
@@ -333,24 +328,25 @@ void f_escalon(float tiempoi,float tiempof, int prec,int cant_muestras){
 }
 
 
-void f_mrua(float tiempoi,float tiempof,float pos,float vel,float acel,int prec,int cant_muestras){
+void f_mrua(double tiempoi,double tiempof, int prec,int cant_muestras){
 
-	float t;
-	float posicion_final;
-	float pos, vel, acel,
-
+	double t;
+	double posicion_final;
+	double pos, vel, acel;
+	t_err stat_ejecucion;
+	
 	fprintf(stderr,"%s\n" ,MSJ_MRUA_POS);
-	pos=leer_double();
+	stat_ejecucion=leer_double(&pos);
 
 	fprintf(stderr,"%s\n" ,MSJ_MRUA_VEL);
-	vel=leer_double();
+	stat_ejecucion=leer_double(&vel);
 
 	fprintf(stderr,"%s\n" ,MSJ_MRUA_ACEL);
-	acel=leer_double();
+	stat_ejecucion=leer_double(&acel);
 
 	fprintf(stderr,"%s\n\n%s\n\n%s",MSJ_FUNCION, MSJ_MRUA, ENCABEZADO_XY);
 
-	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/(float)cant_muestras)){
+	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/cant_muestras)){
 
 			posicion_final=pos+vel*t+0.5*acel*t*t;
 
@@ -360,13 +356,13 @@ void f_mrua(float tiempoi,float tiempof,float pos,float vel,float acel,int prec,
 
 }
 
-void f_exp(float tiempoi,float tiempof, int prec,int cant_muestras){
+void f_exponencial(double tiempoi,double tiempof, int prec,int cant_muestras){
 
-	float t;
+	double t;
 
 	fprintf(stderr,"%s\n\n%s\n\n%s",MSJ_FUNCION, MSJ_EXPONENCIAL,ENCABEZADO_XY);
 
-	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/(float)cant_muestras)){
+	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/cant_muestras)){
 
 			fprintf(stderr, "\n%.*f\t|%.*f", prec, t, prec, exp(t));
 	}
@@ -375,13 +371,13 @@ void f_exp(float tiempoi,float tiempof, int prec,int cant_muestras){
 }
 
 
-void f_loglin(float tiempoi,float tiempof, int prec,int cant_muestras){
+void f_loglineal(double tiempoi,double tiempof, int prec,int cant_muestras){
 
-	float t;
+	double t;
 
 	fprintf(stderr,"%s\n\n%s\n\n%s",  MSJ_FUNCION, MSJ_LOGLINEAL,ENCABEZADO_XY);
 
-	for(t=tiempoi;  t<tiempof;   t+=((tiempof-tiempoi)/(float)cant_muestras)){
+	for(t=tiempoi;  t<tiempof;   t+=((tiempof-tiempoi)/cant_muestras)){
 
 			fprintf(stderr, "\n%.*f\t|%.*f", prec, t, prec, t*log(t));
 	}
@@ -389,9 +385,9 @@ void f_loglin(float tiempoi,float tiempof, int prec,int cant_muestras){
 
 }
 
-void f_log(float tiempoi,float tiempof, int prec,int cant_muestras){
+void f_logaritmica(double tiempoi,double tiempof, int prec,int cant_muestras){
 
-	float t;
+	double t;
 
 	fprintf(stderr,"%s\n\n%s\n\n%s",MSJ_FUNCION, MSJ_LOGARITMICA,ENCABEZADO_XY);
 
@@ -404,41 +400,35 @@ void f_log(float tiempoi,float tiempof, int prec,int cant_muestras){
 }
 
 
-void f_senoidal(float tiempoi, float tiempof, int prec, int cant_muestras){
+void f_senoidal(double tiempoi,double tiempof, int prec,int cant_muestras){
 
-	float t;
-	float sen;
-    float fase;
-    float amp;
-    float frec;
-
+	double t;
+	double sen;
+    double fase;
+	double amp;
+    double frec;
+	t_err stat_ejecucion;
+	
 	fprintf(stderr,"\n%s:\n" ,MSJ_LEER_AMP);
-	amp=leer_float();
+	stat_ejecucion=leer_double(&sen);
 
 	fprintf(stderr,"\n%s:\n" ,MSJ_LEER_FASE);
-	fase=leer_float();
+	stat_ejecucion=leer_double(&fase);
 
 	fprintf(stderr,"\n%s:\n" ,MSJ_LEER_FREC);
-	frec=leer_float();
+	stat_ejecucion=leer_double(&frec);
 
-	fprintf(stderr,"%s\n\n%s\n\n%s",MSJ_FUNCION, MSJ_SENOIDAL,MSJ_TABLA_XY);
+	fprintf(stderr,"%s\n\n%s\n\n%s",MSJ_FUNCION, MSJ_SENOIDAL,ENCABEZADO_XY);  
 
-	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/(float)cant_muestras)){
+	for(t=tiempoi; t<tiempof; t+=((tiempof-tiempoi)/cant_muestras)){
 
 		sen=amp*sin(t*2*pi*frec+fase);
 		fprintf(stderr, "\n%*.f\t|%*.f", prec, t, prec, sen);
 
-		}
-
-
-
+	}
 }
-
 
 void limpiar_buffer(void){
 
 	while(getchar()!='\n');
-
-
 }
-
