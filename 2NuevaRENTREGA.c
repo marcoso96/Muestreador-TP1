@@ -15,7 +15,7 @@
 #include "config.h"
 
 #ifdef LENGUAJE_ES
-#include "macros_reent3.h"
+#include "macros.h"
 #endif
 
 typedef enum {F_SENOIDAL=INDICE_SEN, F_LOG=INDICE_LOG, F_LOGLINEAL=INDICE_LOGLIN,
