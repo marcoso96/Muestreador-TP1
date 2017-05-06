@@ -1,5 +1,24 @@
+	/*ver como hacer la fecha
+		if (strptime(csvfields[FECHA_FIELD_POS],"%D", &fecha_struct)==NULL){
+			
+				del_book_array(&book,&used_size);
+				
+				del_str_array(&csvfield,&n);
+				
+				fclose(fi);
+				fclose(fo);
+			
+			return EXIT_FAILURE;
+		}
+		else{
+		
+			book[used_size].fecha=mktime(&fecha_struct)
+		}
+		
+		*/
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include macros.h
 #include constantes.h
 
