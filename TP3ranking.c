@@ -8,7 +8,7 @@ int main(int argc, char *argv[]){
 	FILE *errorfile;
 	FILE *arrangementfile;
 	
-	if (st=validar_argumentos(argc,argv,&database,&errorfile)!=ST_OK){ 
+	if (st=validar_argumentos(argc,argv,&database,&errorfile,&arrangemetfile)!=ST_OK){ 
 	
 		fprintf(sderr,"%s%S\n", MSJ_ERROR, MSJ_ERROR_PREFIJO);
 		
@@ -39,9 +39,9 @@ int main(int argc, char *argv[]){
 	}
 }
 
-t_status validar_argumentos(int arg c, char *argv[], FILE **database, FILE **errorfile){
+t_status validar_argumentos(int arg c, char *argv[], FILE **database, FILE **errorfile, FILE **arrangemetfile){
 
-	if (argc!=8 || (*database=fopen(argv[DATABASE_ARGV_POS],"r+"))==NULL || *errorfile=fopen(argv[ERRORFILE_ARGV_POS],"r+"))==NULL){
+	if (argc!=8 || (*database=fopen(argv[DATABASE_ARGV_POS],"r+"))==NULL || *errorfile=fopen(argv[ERRORFILE_ARGV_POS],"r+" || arrangementfile=fopen(argv[ARRANGEMENTFILE_ARGV_POS],"r+"))==NULL){
 	
 		return ST_ERROR;
 	}
