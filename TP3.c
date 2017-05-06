@@ -1,4 +1,4 @@
-	/*ver como hacer la fecha
+/*ver como hacer la fecha
 	
 		if (strptime(csvfields[FECHA_FIELD_POS],"%D", &fecha_struct)==NULL){
 			
@@ -17,9 +17,9 @@
 		}
 		
 		*/
+		
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
 #include macros.h
 #include constantes.h
 
@@ -37,19 +37,28 @@ typedef struct libro {
 	
 } book_t;
 
+t_status split(const char *s, char delim, char ***csvfields, size_t *l);
 
 int main(int argc, char *argv[]){
 	
 	book_t *book,*aux;
 	size_t used_size, alloc_size;
-	char ** csvfields, *endptr, line[MAX_STR];            /*Defino las variables*/
+	char **csvfields;
+	char *endptr;
+	char line[MAX_STR];            /*Defino las variables*/
 	FILE *fi, *fo;
 	t_status st;
 	
-	fo= fopen("archivo.bin", "w+");                       /*Abro los archivos que necesito*/
-	fi= stdin;
+	if(argc!=CANT_ARGUMENTOS){ 
+		
+		fprintf (stderr, "%s:%s",MSJ_ERROR,MSJ_ERROR_NOMEM);
+		return EXIT_FAILURE;
+	}
 	
-	if((book =(book_t *)calloc(INIT_CHOP,sizeof(book_t)))==!NULL){                /*Verifico que el espacio que necesito este disponible*/
+	fo= fopen("archivo.bin", "wb+");                       /*Abro los archivos que necesito*/
+	fi= fopen("review.txt", "rt+");
+	
+	if((book =(book_t *)calloc(INIT_CHOP,sizeof(book_t)))=!NULL){                /*Verifico que el espacio que necesito este disponible*/
 		
 		fprintf (stderr, "%s%s",MSJ_ERROR,MSJ_ERROR_NOMEM);
 		
@@ -148,7 +157,7 @@ int main(int argc, char *argv[]){
 			fclose(fo);
 			
 			return EXIT_FAILURE;
-		}
+ 		}
 		
 		del_str_array(&csvfield,&n);
 		
@@ -194,4 +203,49 @@ t_status del_str_array(char **s_array, size_t *l){
 	
 	return ST_OK;
 }
+
+t_status split(const char *s, char delim, char ***strarray, size_t *l){
 	
+	char **cadenas;
+	size_t n, i;
+	char *campo;
+	char *aux;
+	char *linea;
+	char sdelim[2];
+	
+	if(s==NULL||strarray==NULL||l==NULL) return ERROR_NULL_PTR;
+	
+	for(n=1,i=0;s[i];i++){
+		
+		if(s[i]==delim)n++;
+	}
+	if((cadenas==(char **)malloc(n*sizeof(char*)))==NULL){
+	
+		return ERROR_NO_MEMORIA;
+	}
+	if((linea=strdup(s))==NULL){
+		free(cadenas);
+		return ERROR_NO_MEM;
+	}
+	sdelim[0]=delim;
+	sdelim[1]='\0';
+	/*strtok divide el cvs en tokens*/
+	for(i=0, aux=linea; (campo=strtok(aux,sdelim))!=NULL; i++, aux=NULL){
+		if((cadenas[i]=strdup(campo))==NULL){
+			free(line);
+			del_str_array(cadenas, i);
+			*del_str_array=NULL;
+			*l=0;
+			return ERROR_NO_MEMORIA;
+			}
+	}
+	free(line);/*duplicado liberado*/
+	*line=i;
+	*str_array=cadenas;
+	return OK;
+}
+
+
+
+
+
