@@ -1,4 +1,5 @@
 	/*ver como hacer la fecha
+	
 		if (strptime(csvfields[FECHA_FIELD_POS],"%D", &fecha_struct)==NULL){
 			
 				del_book_array(&book,&used_size);
@@ -8,11 +9,11 @@
 				fclose(fi);
 				fclose(fo);
 			
-			return EXIT_FAILURE;
+				return EXIT_FAILURE;
 		}
 		else{
 		
-			book[used_size].fecha=mktime(&fecha_struct)
+			book[used_size].fecha=mktime(&fecha_struct);
 		}
 		
 		*/
