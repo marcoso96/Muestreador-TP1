@@ -1,58 +1,44 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
-typedef struct date {
-	int tm_mday;
-	int tm_mon;
-	int tm_year;
-	} date_t;
-	
+#define MAX_STR 20
+#define ARG_POS 1
+
 typedef struct libro {
-	
+
 	long id;
 	char titulo[MAX_STR];
 	char autor[MAX_STR];
 	char genero[MAX_STR];
-	date_t fecha;														
+	struct tm *fecha;
 	double puntaje;
 	size_t reviews;
-	
+
 } book_t;
 
 
 int main(int argc, char *argv[]){
-	FILE *bin;
-	FILE *deco;
-	long *id;
-	char titulo[MAX_STR];
-	char autor[MAX_STR];
-	char genero[MAX_STR];
-	date_t *fecha;														
-	double *puntaje;
-	size_t *reviews;
-	
-	
-	if(argc!=NUM_ARG){
-		procesar_error();
-		
-		}
-	
-	if((bin=fopen(argv[ARG_ENTRADA],"r+b"))==NULL){
-		procesar_error;
+
+	FILE *bin=fopen(argv[ARG_POS], "r+b");
+	book_t *line=(book_t *)malloc(sizeof(book_t));
+	char *str_fecha=(char*)malloc(sizeof(char)*11);
+
+	while (!feof(bin)){
+
+		fread(line, sizeof(book_t), 1, bin);
+
+		fprintf(stderr, "%ld", line->id);
+		fprintf(stderr, "%s", line->titulo);
+		fprintf(stderr, "%s", line->autor);
+		fprintf(stderr, "%s", line->genero);
+		strftime(str_fecha, 11, "%d/%m/%Y", line->fecha);
+		fprintf(stderr, "%s", str_fecha);
+		fprintf(stderr, "%lf", line->puntaje);
+		fprintf(stderr, "%lud", line->reviews);
 	}
-	
-	if((deco=fopen(argv[ARG_ENTRADA],"w+t"))==NULL){
-		procesar_error();
-	}
-	
-	for(i=0; i<NRO_STRUCT; i++){
-		
-		fread(id, sizeof(long),1, bin);
-		fread(titulo[], sizeof(char)*MAX_STR,1, bin);
-		fread(titulo[], sizeof(char)*MAX_STR,1, bin);
-		fread(autor[], sizeof(char)*MAX_STR,1, bin);
-		fread(genero[], sizeof(char)*MAX_STR,1, bin);
-		/* algo con fseek que ponga al puntero en el siguiente. despues 
-		 * seguir strcopiando al csv en orden con comas*/
-		}
-	
+	 
+	free(line);
+	free(str_fecha);
+	return 0;
+}
