@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "TP3_macros.h"
-#include "TP3_constantes.h"
+#include "crearbase_macros.h"
+#include "crearbase_constantes.h"
 #include <time.h>
 #include <string.h>
 
@@ -13,14 +13,14 @@ typedef struct libro {
 	char titulo[MAX_STR] ;
 	char autor[MAX_STR] ;
 	char genero[MAX_STR];
-	struct tm *fecha;														
+	/*struct tm *fecha;*/														
 	double puntaje;
 	size_t reviews;
 	
 } book_t;
 
 char * strdup(const char *s);
-t_status split(const char *linea, char delim, char ***csvfields, size_t *l);
+t_status split(char *linea, char delim, char **csvfields, size_t *l);
 void handle_error(t_status st);
 t_status del_str_array(char **s_array, size_t l);
 t_status del_book_array(book_t **book, size_t *n);
@@ -29,10 +29,10 @@ int main(int argc, char *argv[]){
 	
 	book_t *book;
 	book_t *aux;
-	size_t used_size, alloc_size, n;
-	char **csvfields=(char **)malloc(sizeof(const char *));
-	char *endptr;
-	char line[MAX_STR];            /*Defino las variables*/
+	size_t used_size, alloc_size, n, i;
+	char **csvfields=(char **)malloc(sizeof(char *));
+	char *endptr=(char*)malloc(sizeof(char));
+	char *line=malloc(sizeof(char)*MAX_STR);            /*Defino las variables*/
 	FILE *fi, *fo;
 	t_status st;
 	
@@ -41,11 +41,11 @@ int main(int argc, char *argv[]){
 		fprintf (stderr, "%s:%s",MSJ_ERROR,MSJ_ERROR_NOMEM);
 		return EXIT_FAILURE;
 	}
-	
-	fo= fopen(argv[ARG_POS_2], "a+");                       /*Abro los archivos que necesito*/
+		
+	fo= fopen(argv[ARG_POS_2], "w+");                       /*Abro los archivos que necesito*/
 	fi= fopen(argv[ARG_POS_1], "r+");
 	
-	if((book=malloc(sizeof(book_t)))!=NULL){                /*Verifico que el espacio que necesito este disponible*/
+	if((book=malloc(sizeof(book_t)))==NULL){                /*Verifico que el espacio que necesito este disponible*/
 		
 		st=ST_ERROR_NO_MEMORIA;
 		handle_error(st);
@@ -64,12 +64,29 @@ int main(int argc, char *argv[]){
 		
 		if((endptr=strchr(line, '\n'))!=NULL) *endptr='\0';  
 		
-		if ((st=split(line,',',&csvfields,&n))!=ST_OK){            
+		for(i=0; i<FIELD_NUM; i++){
+	
+		
+			if((*(csvfields+i)=(char *)malloc(sizeof(char)*MAX_STR))==NULL){
+					
+					st=ST_ERROR_NO_MEMORIA;
+					handle_error(st);
+					free(endptr);
+					fclose(fi);
+					fclose(fo);
+					free(*csvfields);
+					free(csvfields);
+					return EXIT_FAILURE;
+			}
+		
+		}
+		
+		if ((st=split(line,',',csvfields,&n))!=ST_OK){            
 				
 			handle_error(st);
 			
 			del_book_array(&book,&used_size);
-			
+			free(endptr);
 			fclose(fi);
 			fclose(fo);
 			
@@ -87,7 +104,7 @@ int main(int argc, char *argv[]){
 				del_book_array(&book,&used_size);
 				
 				del_str_array(csvfields,n);
-				
+				free(endptr);
 				fclose(fi);
 				fclose(fo);
 			
@@ -99,45 +116,31 @@ int main(int argc, char *argv[]){
 			book=aux;
 			}
 		
-		if(*endptr!='0'){   /*Si endptr no apunta a una casilla con el caracter de una terminacion de un string, habia algo mal*/
-			
-			handle_error(st);
-			
-			del_book_array(&book,&used_size);
-			del_str_array(csvfields,n);
-			
-			fclose(fi);
-			fclose(fo);
-			
-			return EXIT_FAILURE;
-			}
-		
-		book[used_size].id = strtol(csvfields[ID_FIELD_POS],&endptr,0);
-		
-		strcpy(*book[used_size].titulo,csvfields[TITULO_FIELD_POS]);
-		strcpy(*book[used_size].autor,csvfields[AUTOR_FIELD_POS]);
-		strcpy(*book[used_size].genero,csvfields[GENERO_FIELD_POS]);
-		
-		strptime(csvfields[FECHA_FIELD_POS], "%d/%m/%Y", book[used_size].fecha);	
-		
-		book[used_size].puntaje = strtod(csvfields[PUNTAJE_FIELD_POS],&endptr);
-		
-		
 		if(*endptr!='\0'){   /*Si endptr no apunta a una casilla con el caracter de una terminacion de un string, habia algo mal*/
 			
-			st=ST_ERROR_FILE;
+			st=ST_ERROR_WRITE;
 			handle_error(st);
 			
 			del_book_array(&book,&used_size);
 			del_str_array(csvfields,n);
-			
+			free(endptr);
 			fclose(fi);
 			fclose(fo);
 			
 			return EXIT_FAILURE;
 			}
 		
-		book[used_size].reviews = strtol(csvfields[REVIEWS_FIELD_POS],&endptr,0);
+		book[used_size].id = strtol(*(csvfields+ID_FIELD_POS),&endptr,0);
+		
+		strcpy(*book[used_size].titulo,*(csvfields+TITULO_FIELD_POS));
+		strcpy(*book[used_size].autor,*(csvfields+AUTOR_FIELD_POS));
+		strcpy(*book[used_size].genero,*(csvfields+GENERO_FIELD_POS));
+		
+		/*strptime(csvfields[FECHA_FIELD_POS], "%d/%m/%Y", book[used_size].fecha);*/	
+		
+		book[used_size].puntaje = strtod(*(csvfields+PUNTAJE_FIELD_POS),&endptr);
+	
+		book[used_size].reviews = strtol(*(csvfields+REVIEWS_FIELD_POS),&endptr,0);
 		
 		del_str_array(csvfields,n);
 		
@@ -148,14 +151,20 @@ int main(int argc, char *argv[]){
 			st=ST_ERROR_WRITE;
 			handle_error(st);
 			
+			free(endptr);
 			del_book_array(&book,&used_size);
 			fclose(fi);
 			fclose(fo);
 			
 			return EXIT_FAILURE;
 			}
-		
 	}
+	fclose(fi);
+	fclose(fo);
+	free(aux);
+	free(book);
+	for(i=0;i<used_size;i++) free(*(csvfields+i));
+	free(csvfields);
 	return EXIT_SUCCESS;
 }	
 t_status del_book_array(book_t **book, size_t *n){       /*No se que utilidad tiene devolver el estado con esta funcion ni con del_str_array, no se usan en el main los estados que devuelve*/
@@ -186,12 +195,12 @@ t_status del_str_array(char **s_array, size_t l){
 	return ST_OK;
 }
 
-t_status split(const char *linea, char delim, char ***strarray, size_t *l){
+t_status split(char *linea, char delim, char **strarray, size_t *l){
 	
 	char **cadenas;
 	size_t n, i;
-	char *campo;
-	char *lin_aux;
+	char *campo=malloc(sizeof(char)*MAX_STR);
+	char *lin_aux=malloc(sizeof(char)*strlen(linea)+1);
 	char sdelim[2];
 	
 	if(linea==NULL||strarray==NULL||l==NULL) return ST_ERROR_NULL_PTR;
@@ -199,7 +208,7 @@ t_status split(const char *linea, char delim, char ***strarray, size_t *l){
 	for(n=1,i=0;*(linea+i);i++){
 		
 		if(*(linea+i)==delim) n++;
-	}
+		}
 	
 	if((cadenas=(char **)malloc(n*sizeof(char*)))==NULL){
 	
@@ -207,6 +216,7 @@ t_status split(const char *linea, char delim, char ***strarray, size_t *l){
 	}
 	
 	if((lin_aux=strdup(linea))==NULL){ /*duplico la linea*/
+		
 		free(cadenas);
 		return ST_ERROR_NO_MEMORIA;
 	}
@@ -214,19 +224,29 @@ t_status split(const char *linea, char delim, char ***strarray, size_t *l){
 	sdelim[0]=',';
 	sdelim[1]='\0';
 	/*strtok divide el cvs en tokens*/
+	
 	for(i=0;(campo=strtok(lin_aux,sdelim))!=NULL; i++, lin_aux=NULL){
-		if((*(cadenas+i)=strdup(campo))==NULL){
+		
+		if((*(cadenas+i)=(char*)malloc(sizeof(char)*(strlen(campo)+1)))==NULL){
 			
 			free(lin_aux);
+			free(campo);
 			del_str_array(cadenas, i);
 			*l=0;
 			return ST_ERROR_NO_MEMORIA;
 			}
+			*(cadenas+i)=strdup(campo);
 		}
-	
+		
 	free(lin_aux);/*duplicado liberado*/
 	lin_aux=NULL;
-	strarray=&cadenas;
+	
+	for(i=0; i<FIELD_NUM; i++){
+		
+		*(strarray+i)=*(cadenas+i);
+	
+	}	
+	
 	return ST_OK;
 }
 
