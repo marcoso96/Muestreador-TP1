@@ -72,7 +72,47 @@ int main(int argc, char *argv[]){
 		cant_lineas=count_lines(arrangefile);
 																					
 		switch(argv[ARGV_OP]){
-		
+				
+				case 'B':
+						aux_cant_lineas=1;  /*Se supone que el archivo arrangefile no es nulo, asi que por lo menos tiene una linea que dar de baja*/
+
+						fread(line_arrangefile, sizeof(book_t), 1, arrangefile);
+
+						while(!feof(database)){
+
+							fread(line_database, sizeof(book_t), 1, database);
+
+							if(line_database->id==line_arrangefile->id){ /*si se ecuentra el mismo id, no escribimos en el temporal esa linea */
+
+								if(aux_cant_lineas==cant_lineas){ /*caso en el que se llego al ultimo registro par borrar. Se copia todo lo que queda de database en temporal, y finalmente se llega al endoffile*/
+
+									while(!feof(database)){
+
+										fread(line_database, sizeof(book_t), 1, database);   /*Leo la siguiente linea de database ya que la anterior no nos interesa*/
+										fwrite(line_database, sizeof(book_t),1,tmpfile);			
+									}	
+								}
+								else{
+
+									aux_cant_lineas++;
+									fread(line_arrangefile, sizeof(book_t), 1, arrangefile);  /*se lee la siguiente linea del arrangefile*/
+								}
+							}
+
+							else{
+
+									fwrite(line_database, sizeof(book_t),1,tmpfile);
+							}
+						}
+
+						if (aux_cant_lineas++!=cant_lineas){
+
+							fprintf(log, "%s\n", MSJ_ERROR_BAJA);   /*se llego al EOF antes de que se dieran 
+																		los registros. esto puede pasar porque los registros no estaban en orden o hay un registro que se queria dar de baja y en realidad no existia en database.*/
+						}	
+
+				}
+
 			case 'A':
 					
 					fread(line_arrangefile, sizeof(book_t), 1, arrangefile);
@@ -147,7 +187,9 @@ int main(int argc, char *argv[]){
 				fread(line_arrangefile, sizeof(book_t), 1, arrangefile);
 
 				while(!feof(database)){
-
+					
+					fread(line_database, sizeof(book_t), 1, database);
+					
 					if(line_database->id==line_arrangefile->id){ /*si se ecuentra el mismo id, escribimos en el temporal la linea de arrangefile que contiene las modificaciones */
 
 						fwrite(line_arrangefile, sizeof(book_t),1,temporal); /*SOLO SE AGREGA ESTO A DIFERENCIA DE BAJA*/
