@@ -30,22 +30,14 @@ int main(int argc, char *argv[]){
 	FILE *arrangefile;
 	FILE *temporal;
 
-	size_t used_size, alloc_size,;
-	char **csvfields=NULL;
-	char *endptr=NULL;
-	char line[MAX_STR];
-	
 	book_t *line_arrangefile=(book_t*)malloc(sizeof(book_t));
 	book_t *line_database=(book_t*)malloc(sizeof(book_t));
 	book_t *standby_line=(book_t*)malloc(sizeof(book_t));
 
-	book_t *book,*aux;
 	t_status st;
 	
 	temporal=tmpfile();
 	
-	errorfile=fopen(argv[ARG_LOG],"w+");       /*el archivo que guarda los errores es errorfile, se abre cuando se validan los argumentos*/
-	 
 	if ((st=validar_argumentos(argc, argv, &database, &errorfile, &arrangefile))!=ST_OK){ 
 	
 		fprintf(errorfile, "%s:%s\n", MSJ_ERROR, MSJ_ERROR_PREFIJO);
