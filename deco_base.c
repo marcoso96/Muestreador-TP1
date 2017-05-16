@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
 		fprintf(stderr, "%s", line->genero);
 		strftime(str_fecha, 11, "%d/%m/%Y", line->fecha);
 		fprintf(stderr, "%s", str_fecha);
-		fprintf(stderr, "%lf", line->puntaje);
+		fprintf(stderr, "%f", line->puntaje);
 		fprintf(stderr, "%lud", line->reviews);
 	}
 	 
