@@ -7,31 +7,19 @@
 
 typedef enum {ST_OK,ST_ERROR} t_status;
 
-typedef struct date {
-	
-	int tm_mday;
-	int tm_mon;
-	int tm_year;
-	
-} date_t;
-	
 typedef struct book {
 	
 	long id;
 	char titulo[MAX_TITLE];
 	char autor[MAX_AUTOR];
 	char genero[MAX_GENERO];
-	/*date_t fecha;*/														
+	struct tm fecha;														
 	double puntaje;
 	size_t reviews;
 	
 } book_t;
 
-t_status split(const char *s, char delim, char ***csvfields, size_t *l);
 t_status validar_argumentos(int argc, char *argv[], FILE **database, FILE **errorfile, FILE **arrangefile);
-t_status copy_file(FILE **temporal, FILE **database);
-t_status del_str_array(char **s_array, size_t *l)
-t_status make_date(char *str_fecha, t_book *fecha);
 void close_all_files (FILE *database, FILE *errorfile, FILE *arrangefile);
 
 int main(int argc, char *argv[]){
@@ -224,9 +212,11 @@ int main(int argc, char *argv[]){
 
 		}
 	}
+
     close_all_files(database,log,arrangefile);
 
     if(count_lines(log)!=0){
+	    
         remove(argv[DATABASE_ARGV_POS]);
         rename(temporal, argv[DATABASE_ARGV_POS]);
     }
@@ -237,7 +227,6 @@ int main(int argc, char *argv[]){
 return EXIT_SUCCESS;
 }
 	
-
 t_status validar_argumentos(int argc, char *argv[], FILE **database, FILE **errorfile, FILE **arrangefile){
 
 	if (argc!=8 || 
@@ -253,61 +242,18 @@ t_status validar_argumentos(int argc, char *argv[], FILE **database, FILE **erro
 	
 }	
 
-t_status split(const char *s, char delim, char ***strarray, size_t *l){
-	
-	char **cadenas;
-	size_t n, i;
-	char *campo;
-	char *aux;
-	char *linea;
-	char sdelim[2];
-	
-	if(s==NULL||strarray==NULL||l==NULL) return ERROR_NULL_PTR;
-	
-	for(n=1,i=0;s[i];i++){
-		
-		if(s[i]==delim)n++;
-	}
-	
-	if((cadenas==(char **)malloc(n*sizeof(char*)))==NULL){
-	
-		return ERROR_NO_MEMORIA;
-	}
-	
-	if((linea=strdup(s))==NULL){
-		free(cadenas);
-		return ERROR_NO_MEM;
-	}
-	sdelim[0]=',';
-	sdelim[1]='\0';
-	/*strtok divide el cvs en tokens*/
-	for(i=0, aux=linea; (campo=strtok(aux,sdelim))!=NULL; i++, aux=NULL){
-		if((cadenas[i]=strdup(campo))==NULL){
-			free(linea);
-			del_str_array(cadenas, i);
-			*del_str_array=NULL;
-			*l=0;
-			return ERROR_NO_MEMORIA;
-			}
-	}
-	free(linea);/*duplicado liberado*/
-	*linea=i;
-	*str_array=cadenas;
-	return OK;
-}
-
-/*int countlines (FILE *arrangefile){ 
+int count_lines (FILE *arrangefile){ 
 	
 	int lines=0;
 	int aux;
 			
 	while((aux=fgetc(arrangefile))!=EOF){
 			
-		if (=='\n') lines++; 
+		if (aux=='\n') lines++; 
 		
 	}
 	return lines;
-}*/
+}
 
 void close_all_files (FILE *database, FILE *errorfile, FILE *arrangefile){
 	
@@ -317,52 +263,4 @@ void close_all_files (FILE *database, FILE *errorfile, FILE *arrangefile){
 	
 	return 0;
 	
-}
-		
-t_status make_date(char *str_fecha, t_book *fecha){
-		
-	char **aux_fecha;
-	char fec_delim[2];
-	char *t_fecha;
-	/*smax es el umero de caracteres del campo, supongo que deberian ser 10 de dd/mm/yyyy*/
-	if(strptime(str_fecha, smax, "%d/%m/%Y", fecha)!=smax) return ERROR_FECHA;
-	
-	return ST_OK;
-}
-	
-t_status del_book_array(book_t **book, size_t *n){       /*No se que utilidad tiene devolver el estado con esta funcion ni con del_str_array, no se usan en el main los estados que devuelve*/
-	
-	if (book==NULL) return ST_ERROR;
-	
-	free (*book);
-	
-	*book=NULL;
-	*n=0;
-	
-	return ST_OK;   /*no faltaria un else aca?*/
-}
-
-
-t_status copy_file(FILE **temporal, FILE **database){
-	
-	char c;
-	/*EN QUE PUEDE FALLAR? PREGUNTAR*/
-	while((c=fgetc(database))!=EOF) fputc(c,temporal);
-	
-	return OK; 		
-}
-		
-t_status del_str_array(char **s_array, size_t *l){
-	
-	size_t i;
-	
-	for(i=0;i<l;i++){
-		
-		free (s_array[i]);
-		s_array[i]=NULL;
-	}
-	
-	free(s_array);
-	
-	return ST_OK;
 }
