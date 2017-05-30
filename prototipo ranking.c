@@ -80,26 +80,257 @@ void cargar_book(char ***campos, book_t **arrange_book, size_t arr_size){
 }
 
 
-realizar_baja(FILE *temporal, FILE *database, FILE *log, book_t **arrange_book, size_t arr_size){
+t_status realizar_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
 	
-	book_t *temp_book;
+	book_t db_book;
+	book_t arrange_book;
 	size_t used_size=0;
+	size_t arrange_count;
+	
+	fread(arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+	
+	while(fread(db_book, sizeof(book_t), SINGLE_CONST, database)!=NULL){
+		
+		/*temp_book=(book_t *)realloc(temp_book, (used_size+INIT_CHOP)*sizeof(book_t));*/ 
+		if(db_book.id<arrange_book.id){
+			
+			fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			
+			continue;	
+		}
+		
+		if(db_book.id==arrange_book.id){
+			
+			fread(arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+			arrange_count++;
+			continue;
+		}
+		
+		if(db_book.id<arrange_book.id){
+			
+			fprintf(log, "%s: %d", MSJ_ERROR_BAJA, arrange_count);
+			return ST_ERROR;
+		}
+			
+		if(arrange_count=arr_size){
+			
+			fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			
+			while(fread(db_book, sizeof(book_t), SINGLE_CONST, database)!=NULL){
+				
+				fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			}
+		}
+	}
+}
+	
+t_status realizar_modificacion(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
+	
+	book_t db_book;
+	book_t arrange_book;
+	size_t used_size=0;
+	size_t arrange_count=1;
+	
+	fread(arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+	
+	while(fread(db_book, sizeof(book_t), SINGLE_CONST, database)!=NULL){
+		
+		/*temp_book=(book_t *)realloc(temp_book, (used_size+INIT_CHOP)*sizeof(book_t));*/ 
+		if(db_book.id<arrange_book.id){
+			
+			fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			
+			continue;	
+		}
+		
+		if(db_book.id==arrange_book.id){
+			
+			fwrite(arrange_book, sizeof(book_t), SINGLE_CONST, temporal);
+			fread(arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+			arrange_count++;
+			continue;
+		}
+		
+		if(db_book.id<arrange_book.id){
+			
+			fprintf(log, "%s: %d\n", MSJ_ERROR_BAJA, arrange_count);
+			return ST_ERROR;
+		}
+		
+		if (arrange_count!=arr_size){
+
+			fprintf(log, "%s\n", MSJ_ERROR_MODIFICACIONES);   
+			return ST_ERROR;
+		}
+				
+		if(arrange_count=arr_size){
+			
+			fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			
+			while(fread(db_book, sizeof(book_t), SINGLE_CONST, database)!=NULL){
+				
+				fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			
+			}
+		}
+	}
+}	
+
+t_status realizar_alta(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
+	
+	book_t db_book;
+	book_t arrange_book;
+	book_t standby_book;
+	size_t used_size=0;
+	size_t arrange_count=1;
+	
+	fread(arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+	fread(database,sizeof(book_t), SINGLE_CONST, db_book);
 	
 	while(!feof(database)){
 		
-		temp_book=(book_t *)realloc(temp_book, (used_size+INIT_CHOP)*sizeof(book_t));
-		 
-		fread(temp_book, sizeof(book_t), SINGLE_CONS, database);
-		
-		for(i=0; i<=arr_size; i++){
+		if(db_book.id<arrange_book.id){
 			
-			if(temp_book[used_size].id==*arrange_book[]
+			standby_book=db_book;
+			
+			fread(database,sizeof(book_t), SINGLE_CONST, db_book);
+			
+			if(db_book.id>arrange_book.id){
+				
+				fwrite(standby_line, sizeof(book_t), SINGLE_CONST, temporal);
+				fwrite(arrange_file, sizeof(book_t), SINGLE_CONST, temporal);
+				
+				if(arrange_count<=arr_size){
+					
+					fread(arrange_book, sizeof(book_t), SINGLE_CONST, arrange);		
+					arrange_count++;
+				}
+				
+				else {
+					
+					fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+					
+					while(fread(database,sizeof(book_t), SINGLE_CONST, db_book)!=NULL){
+						
+						fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+					}
+				}			
+			}					
 		
+			
+			fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			
+			continue;	
+		}
 		
+		if(db_book.id==arrange_book.id){
+			
+			
+			fprintf(log, "%s:%d", MSJ_ERROR_ALTA, arrange_book.id);
+			
+			fread(arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+		
+			continue;
+		}
+		
+		else{
+				
+			fwrite(arrange_book, sizeof(book_t), SINGLE_CONST,temporal);
+						
+			if((arrange_book.id) == (db_book.id)) fprintf(log, "%s,%s\n", MSJ_ERROR, MSJ_ERROR_ALTA);
+
+			if(arrange_count==arr_size){
+							
+					while(!feof(database)){
+
+						fwrite(arrange_book, sizeof(book_t), SINGLE_CONST,temporal);
+						fread(database,sizeof(book_t), SINGLE_CONST, db_book);			
+					}
+				}
+				
+			else{ 
+
+					fread(database,sizeof(book_t), SINGLE_CONST, db_book);
+					arrange_count++;
+				}
+				
+		}
+	}
+		
+		} 
 	
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	
-	realizar_baja(database, log, campos, &arrange_book);
+aux_cant_lineas=1;  /*Se supone que el archivo arrangefile no es nulo, asi que por lo menos tiene una linea que dar de baja*/
+
+				fread(line_arrangefile, sizeof(book_t), 1, arrangefile);
+
+				while(!feof(database)){
+
+					fread(line_database, sizeof(book_t), 1, database);
+
+					if(line_database->id==line_arrangefile->id){ /*si se ecuentra el mismo id, escribimos en el temporal la linea de arrangefile que contiene las modificaciones */
+						
+						fwrite(line_arrangefile, sizeof(book_t),1,temporal); /*SOLO SE AGREGA ESTO A DIFERENCIA DE BAJA*/
+
+						if(aux_cant_lineas==cant_lineas){ /*caso en el que se llego al ultimo registro para modificiar. Se copia todo lo que queda de database en temporal, y finalmente se llega al endoffile*/
+			
+							while(!feof(database)){
+
+								fread(line_database, sizeof(book_t), 1, database);   /*Leo la siguiente linea de database ya que la anterior no nos interesa*/
+								fwrite(line_database, sizeof(book_t),1,temporal);			
+							}	
+						}
+						else{
+
+							aux_cant_lineas++;
+							fread(line_arrangefile, sizeof(book_t), 1, arrangefile);  /*se lee la siguiente linea del arrangefile*/
+						}
+					}
+
+					else{
+			
+							fwrite(line_database, sizeof(book_t),1,temporal);
+					}
+				}
+
+				if (aux_cant_lineas++!=cant_lineas){
+
+					fprintf(log, "%s\n", MSJ_ERROR_MODIFICACIONES);   /*se llego al EOF antes de que se modificaran todos
+																los registros. esto puede pasar porque hay registros que se quieren modificar y no existen.*/
+				}	
+		
+		break;
 
 
 
