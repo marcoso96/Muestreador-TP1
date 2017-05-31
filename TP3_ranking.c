@@ -22,6 +22,9 @@ typedef struct book {
 
 typedef enum {ALTA, BAJA, MODIFICACION} t_operacion;
 
+t_status realizar_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size);
+t_status realizar_modificacion(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size);
+t_status realizar_alta(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size);
 t_status validar_argumentos(int argc, char *argv[], FILE **database, FILE **errorfile, FILE **arrangefile, t_operacion * st_op);
 int count_lines (FILE *arrangefile);
 void close_all_files (FILE *database,FILE *log,FILE *arrangefile);
@@ -35,21 +38,10 @@ int main(int argc, char *argv[]){
 	FILE *temporal;
 	
 	temporal=tmpfile();
-
-	int aux_cant_lineas;
+	
 	int cant_lineas;
-	
-	char **campos;
-	
 	t_status st;
 	t_operacion st_op;
-	
-	
-	book_t *arrange_book=(book_t*)malloc(sizeof(book_t));
-	/*
-	book_t *line_arrangefile=(book_t*)malloc(sizeof(book_t));
-	book_t *line_database=(book_t*)malloc(sizeof(book_t));
-	book_t *standby_line=(book_t*)malloc(sizeof(book_t)); */
 	
 	if ((st=validar_argumentos(argc, argv, &database, &log, &arrangefile, &st_op))!=ST_OK){ 
 	
@@ -66,131 +58,29 @@ int main(int argc, char *argv[]){
 	switch (st_op){
 		
 		case BAJA:
-				
-				leer_modificaciones(arrangefile, &campos, &cant_modif, &arr_size);
-				
-				cargar_book(campos, &arrange_book, &arr_size);
-				
-				realizar_baja(database, log, campos, &arrange_book);
+						
+				st=realizar_baja(temporal, database, log, arrangefile, cant_lineas);
 		
-		break; 
+				break; 
 		
 		case ALTA:
-		
-			fread(line_arrangefile, sizeof(book_t), 1, arrangefile);
-			fread(line_database, sizeof(book_t), 1, database);
-
-			aux_cant_lineas =1;
-
-			while(!feof(database)){
-
-				if((line_arrangefile->id) > (line_database->id)){
-
-					standby_line=line_database;         /*Guardo la linea anterior de database */
-					fread(line_database, sizeof(book_t), 1, database);  /*Leo la siguiente linea de database*/
 				
-					if((line_arrangefile->id) <= (line_database->id)){   /*Comparo nuevamente, si resulta que el ahora id de arrangefile no supera al de database, entonces es momento de poner el registro da arrangefile en temporal*/
+				st=realizar_alta(temporal, database, log, arrangefile, cant_lineas);
+		
 				
-						fwrite(line_arrangefile, sizeof(book_t),1,temporal);
-
-						if((line_arrangefile->id) == (line_database->id)) fprintf(log, "%s,%s\n", MSJ_ERROR, MSJ_ERROR_ALTA);
-
-						if(aux_cant_lineas==cant_lineas){
-								
-							fwrite(standby_line, sizeof(book_t),1,temporal); /*EScribo la linea que guarde y dps guardo el resto*/
-
-							while(!feof(database)){
-
-								fread(line_database, sizeof(book_t), 1, database);   /*Leo la siguiente linea de database ya que la anterior no nos interesa*/
-								fwrite(line_database, sizeof(book_t),1,temporal);			
-							}
-						}
-						else{ 
-
-							fread(line_arrangefile, sizeof(book_t), 1, arrangefile); /*ya que todavia quedan registro por agregar, leemos la siguiente linea de arrangefile*/							
-							aux_cant_lineas++;
-						}
-					}
-					else{
-
-						fwrite(standby_line, sizeof(book_t),1,temporal);	 /*si resulto que todavia no supera el id, escribimos el registro de*/					
-					}
-
-				}
-				else{
-						fwrite(line_arrangefile, sizeof(book_t),1,temporal);
-						
-						if((line_arrangefile->id) == (line_database->id)) fprintf(log, "%s,%s\n", MSJ_ERROR, MSJ_ERROR_ALTA);
-
-						if(aux_cant_lineas==cant_lineas){
-							
-							while(!feof(database)){
-
-								fwrite(line_database, sizeof(book_t),1,temporal);
-								fread(line_database, sizeof(book_t), 1, database);			
-							}
-						}
-						else{ 
-
-							fread(line_arrangefile, sizeof(book_t), 1, arrangefile);
-							aux_cant_lineas++;
-						}
-						
-				}
-			}
-		
-		
-		break; 
+				break; 
 		
 		case MODIFICACION:
 
-				aux_cant_lineas=1;  /*Se supone que el archivo arrangefile no es nulo, asi que por lo menos tiene una linea que dar de baja*/
-
-				fread(line_arrangefile, sizeof(book_t), 1, arrangefile);
-
-				while(!feof(database)){
-
-					fread(line_database, sizeof(book_t), 1, database);
-
-					if(line_database->id==line_arrangefile->id){ /*si se ecuentra el mismo id, escribimos en el temporal la linea de arrangefile que contiene las modificaciones */
-						
-						fwrite(line_arrangefile, sizeof(book_t),1,temporal); /*SOLO SE AGREGA ESTO A DIFERENCIA DE BAJA*/
-
-						if(aux_cant_lineas==cant_lineas){ /*caso en el que se llego al ultimo registro para modificiar. Se copia todo lo que queda de database en temporal, y finalmente se llega al endoffile*/
-			
-							while(!feof(database)){
-
-								fread(line_database, sizeof(book_t), 1, database);   /*Leo la siguiente linea de database ya que la anterior no nos interesa*/
-								fwrite(line_database, sizeof(book_t),1,temporal);			
-							}	
-						}
-						else{
-
-							aux_cant_lineas++;
-							fread(line_arrangefile, sizeof(book_t), 1, arrangefile);  /*se lee la siguiente linea del arrangefile*/
-						}
-					}
-
-					else{
-			
-							fwrite(line_database, sizeof(book_t),1,temporal);
-					}
-				}
-
-				if (aux_cant_lineas++!=cant_lineas){
-
-					fprintf(log, "%s\n", MSJ_ERROR_MODIFICACIONES);   /*se llego al EOF antes de que se modificaran todos
-																los registros. esto puede pasar porque hay registros que se quieren modificar y no existen.*/
-				}	
+				st=realizar_modificacion(temporal, database, log, arrangefile, cant_lineas);
 		
-		break;
+				break;
 		
 	}
 
-	    fclose(database);
-		fopen(argv[DATABASE_ARGV_POS], "w");
-		fwrite(temporal, sizeof(book_t), count_lines(temporal), database);
-		close_all_files(database,log,arrangefile);
+	fopen(argv[DATABASE_ARGV_POS], "w");
+	/*RENOMBRAR EL ARCHIVO TEMPORAL*/
+	close_all_files(database,log,arrangefile);
 
 	return EXIT_FAILURE;
 
@@ -245,4 +135,152 @@ void close_all_files (FILE *database,FILE *log,FILE *arrangefile){
 	fclose(arrangefile);
 	
 	return ;	
+}
+
+
+t_status realizar_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
+	
+	book_t db_book;
+	book_t arrange_book;
+	size_t arrange_count;
+	
+	fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+	
+	while(fread(&db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
+		
+		if(db_book.id<arrange_book.id){
+			
+			fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			continue;	
+		}
+		
+		if(db_book.id==arrange_book.id){
+			
+			if((fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
+				
+				arrange_count++;
+				continue;
+			}
+			else break;
+		}	
+	}
+	
+	while(fread(&db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
+		
+		fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+	
+	}
+	
+	if(arrange_count!=arr_size){
+		
+		fprintf(log, "%s", MSJ_ERROR_BAJA);
+		
+	}
+	
+	return ST_OK;
+		
+}
+	
+t_status realizar_modificacion(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
+	
+	book_t db_book;
+	book_t arrange_book;
+	size_t arrange_count=SINGLE_CONST;
+	
+	fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+	
+	while(fread(&db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
+		
+		if(db_book.id<arrange_book.id){
+			
+			fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			continue;	
+		}
+		
+		if(db_book.id==arrange_book.id){
+			
+			fwrite(&arrange_book, sizeof(book_t), SINGLE_CONST, temporal);
+			if((fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
+			
+				arrange_count++;
+				continue;
+			}
+			
+			else break;
+		}
+	}
+	
+	while((fread(&db_book, sizeof(book_t), SINGLE_CONST, database))!=SINGLE_CONST){
+		
+		fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+	
+	}
+			
+	if(arrange_count!=arr_size){
+		
+		fprintf(log, "%s", MSJ_ERROR_MODIFICACIONES);
+	}
+
+	return ST_OK;
+}
+
+t_status realizar_alta(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
+	
+	book_t db_book;
+	book_t arrange_book;
+	size_t arrange_count=1;
+	
+	fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+	
+	while(fread(&db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
+		
+		if(db_book.id<arrange_book.id){
+			
+			fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			
+			continue;	
+		}
+		
+		if(db_book.id==arrange_book.id){
+			
+			fprintf(log, "%s:%ld\n", MSJ_ERROR_ALTA, db_book.id);
+			fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			
+			if((fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
+			
+				arrange_count++;
+				continue;
+			}
+			
+			else break;
+		}
+		
+		if(db_book.id>arrange_book.id){
+			
+			fwrite(&arrange_book, sizeof(book_t), SINGLE_CONST, temporal);
+			arrange_count++;	
+			
+			if((fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
+			
+				arrange_count++;
+				continue;
+			}
+			
+			else break;
+		}
+				
+	}
+	
+	while(fread(&db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
+		
+		fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+	
+	}
+			
+	if(arrange_count!=arr_size){
+		
+		fprintf(log, "%s", MSJ_ERROR_ALTA);
+	}
+	
+	return ST_OK;
 }

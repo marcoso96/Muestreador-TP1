@@ -12,3 +12,4 @@
 #define DATE_LENGTH 11
 #define PUNTAJE_LENGTH 3
 #define REVIEWS_MAX 5
+#define SINGLE_CONST 1
