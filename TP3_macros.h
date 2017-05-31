@@ -4,8 +4,11 @@
 #define MSJ_ERROR_ALTA "Falla en archivo a dar de alta. Existen registros duplicados"
 #define MSJ_ERROR_MODIFICACIONES "Falla en archivo a modificar. Registros a modificar no existen"
 #define MSJ_ERROR_PREFIJO "Error de prefijo"
+#define MSJ_ERROR_REMOVE "Error de removido de base de datos inicial"
+#define MSJ_ERROR_RENAME "Error de renombrado de archivo"
+#define MSJ_ERROR_OPERACION "Error operacional"
 
-
+#define TMP_FILE "Temporal"
 #define OP_ALTA "Alta"
 #define OP_BAJA "Baja"
 #define OP_MODIFICACION "Modificaciones"

@@ -7,6 +7,7 @@
 #include "TP3_macros.h"
 
 typedef enum {ST_OK,ST_ERROR} t_status;
+typedef enum {TRUE_RV=1, FALSE_RV=0} t_retval;
 	
 typedef struct book {
 	
@@ -27,7 +28,7 @@ t_status realizar_modificacion(FILE *temporal, FILE *database, FILE *log, FILE *
 t_status realizar_alta(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size);
 t_status validar_argumentos(int argc, char *argv[], FILE **database, FILE **errorfile, FILE **arrangefile, t_operacion * st_op);
 int count_lines (FILE *arrangefile);
-void close_all_files (FILE *database,FILE *log,FILE *arrangefile);
+void close_all_files (FILE *temporal,FILE *database,FILE *log,FILE *arrangefile);
 
 int main(int argc, char *argv[]){
 
@@ -36,18 +37,20 @@ int main(int argc, char *argv[]){
 	FILE *log;
 	FILE *arrangefile;
 	FILE *temporal;
-	
-	temporal=tmpfile();
-	
+	time_t date=time(NULL);
 	int cant_lineas;
 	t_status st;
 	t_operacion st_op;
+	
+	temporal=fopen(TMP_FILE, "w+b");
 	
 	if ((st=validar_argumentos(argc, argv, &database, &log, &arrangefile, &st_op))!=ST_OK){ 
 	
 		fprintf(log, "%s:%s\n", MSJ_ERROR, MSJ_ERROR_ARG);
 		
-		close_all_files(database,log,arrangefile);
+		remove(TMP_FILE);
+		
+		close_all_files(temporal,database,log,arrangefile);
 		
 		return EXIT_FAILURE;
 	}
@@ -77,13 +80,33 @@ int main(int argc, char *argv[]){
 				break;
 		
 	}
-
-	fopen(argv[DATABASE_ARGV_POS], "w");
-	/*RENOMBRAR EL ARCHIVO TEMPORAL*/
-	close_all_files(database,log,arrangefile);
-
-	return EXIT_FAILURE;
-
+	
+	if(st==ST_OK){
+		
+		if((remove(argv[DATABASE_ARGV_POS]))!=OK_RV){
+			
+			fprintf(log, "%s:%s\n", asctime(gmtime(&date)), MSJ_ERROR_REMOVE);
+			close_all_files (temporal,database,log,arrangefile);
+			return EXIT_FAILURE;
+		}
+			
+		if(rename(TMP_FILE, argv[DATABASE_ARGV_POS])!=OK_RV){
+			
+			fprintf(log, "%s:%s\n", asctime(gmtime(&date)), MSJ_ERROR_RENAME);
+			close_all_files (temporal,database,log,arrangefile);
+			return EXIT_FAILURE;
+		}
+		
+		return EXIT_SUCCESS;
+	}
+	
+	else {
+	
+		close_all_files (temporal,database,log,arrangefile);
+		fprintf(log, "%s:%s\n", asctime(gmtime(&date)), MSJ_ERROR_OPERACION);
+		return EXIT_FAILURE;
+	}
+	
 }
 	
 
@@ -128,11 +151,12 @@ int count_lines (FILE *arrangefile){
 	return lines;
 }
 
-void close_all_files (FILE *database,FILE *log,FILE *arrangefile){
+void close_all_files (FILE *temporal, FILE *database,FILE *log,FILE *arrangefile){
 	
 	fclose(database);
 	fclose(log);
 	fclose(arrangefile);
+	fclose(temporal);
 	
 	return ;	
 }

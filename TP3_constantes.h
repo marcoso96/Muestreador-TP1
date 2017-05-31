@@ -13,3 +13,7 @@
 #define PUNTAJE_LENGTH 3
 #define REVIEWS_MAX 5
 #define SINGLE_CONST 1
+
+#define OK_RV 0
+#define ERROR_RV 1
+	

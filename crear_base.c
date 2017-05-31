@@ -85,10 +85,9 @@ int main(int argc, char *argv[]){
 				
 			handle_error(st);
 			
-			/*del_book_array(&book,&used_size);*/
-			del_str_array(&csvfields, FIELD_NUM);	
-			free(csvfields);
-		
+			free(book);
+			del_str_array(&csvfields, nro_campos);	
+					
 			fclose(fi);
 			fclose(fo);
 			
@@ -97,9 +96,7 @@ int main(int argc, char *argv[]){
 
 		if (nro_campos != FIELD_NUM){
 			
-			del_str_array(&fechafields, fecha_campos); /*medio confuso estos dos nombres*/
 			del_str_array(&csvfields, nro_campos);
-			csvfields=NULL;
 			continue; /*fuerza el proximo ciclo*/
 		}
 		
