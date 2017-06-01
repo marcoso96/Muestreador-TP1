@@ -24,9 +24,7 @@ typedef struct book {
 typedef enum {ALTA, BAJA, MODIFICACION} t_operacion;
 
 t_status realizar_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size);
-void comparaciones_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t *arrange_count,book_t **db_book,book_t **arrange_book);
 t_status realizar_modificacion(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size);
-void comparaciones_modificaciones(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t *arrange_count,book_t **db_book,book_t **arrange_book);
 t_status realizar_alta(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size);
 t_status validar_argumentos(int argc, char *argv[], FILE **database, FILE **errorfile, FILE **arrangefile, t_operacion * st_op);
 int count_lines (FILE *arrangefile);
@@ -91,14 +89,13 @@ int main(int argc, char *argv[]){
 			close_all_files (temporal,database,log,arrangefile);
 			return EXIT_FAILURE;
 		}
-			
+
 		if(rename(TMP_FILE, argv[DATABASE_ARGV_POS])!=OK_RV){
 			
 			fprintf(log, "%s:%s\n", asctime(gmtime(&date)), MSJ_ERROR_RENAME);
 			close_all_files (temporal,database,log,arrangefile);
 			return EXIT_FAILURE;
 		}
-		
 		return EXIT_SUCCESS;
 	}
 	
@@ -122,15 +119,15 @@ t_status validar_argumentos(int argc, char *argv[], FILE **database, FILE **log,
 		return ST_ERROR;
 	}
 	
-	if((strcmp(argv[ARGV_OP],OP_ALTA))==0) *st_op=ALTA;
+	if((strcmp(argv[ARGV_OP],"OP_ALTA"))==0) *st_op=ALTA;
 	
 	else{ 
 		
-		if((strcmp(argv[ARGV_OP],OP_BAJA))==0) *st_op=BAJA;
+		if((strcmp(argv[ARGV_OP],"OP_BAJA"))==0) *st_op=BAJA;
 		
 		else{ 
 			
-			if((strcmp(argv[ARGV_OP],OP_MODIFICACION))==0) *st_op=MODIFICACION;
+			if((strcmp(argv[ARGV_OP],"OP_MODIFICACION"))==0) *st_op=MODIFICACION;
 			
 			else return ST_ERROR;
 		}
@@ -165,74 +162,90 @@ void close_all_files (FILE *temporal, FILE *database,FILE *log,FILE *arrangefile
 
 
 t_status realizar_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
-    
-    book_t *db_book;
-    book_t *arrange_book;
-    size_t arrange_count=SINGLE_CONST;
-    
-    fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
-    
-    while(fread(db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST || arrange_count==arr_size){
-       
-		comparaciones_baja(temporal, database, log, arrange, &arrange_count, &db_book, &arrange_book);
-    }
-    
-    while(fread(db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
-        
-        fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
-    
-    }
-    
-    if(arrange_count!=arr_size){
-        
-        fprintf(log, "%s", MSJ_ERROR_BAJA);
-        
-   }
-    
-    return ST_OK;
-        
-}
+	
+	book_t db_book;
+	book_t arrange_book;
+	size_t arrange_count;
+	
+	fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+	
+	while(fread(&db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
+		
+		if(db_book.id<arrange_book.id){
+			
+			fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			continue;	                                                                     /*No se contempla el caso en que hay un registro que se quiere dar de baja y en particular este registro es menor a el de database*/
+		}
 
-void comparaciones_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t *arrange_count,book_t **db_book,book_t **arrange_book){
-	 
-	if((*db_book)->id < (*arrange_book)->id){
-            
-		fwrite(*db_book, sizeof(book_t), SINGLE_CONST, temporal);                                                                         
-        }
+		if(db_book.id>arrange_book.id){  /*Esto puede ocurrir solo si se quiere dar de baja un registro que no existe*/
 
-	else if((*db_book)->id > (*arrange_book)->id){  /*Esto puede ocurrir solo si se quiere dar de baja un registro que no existe*/
-
+			fprintf(log, "%s", MSJ_ERROR_BAJA);
+			fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			
+			if((fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
+				
+				arrange_count++;
+				continue;
+			}
+			else break;
+		}
+		
+		if(db_book.id==arrange_book.id){
+			
+			if((fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
+				
+				arrange_count++;
+				continue;
+			}
+			else break;
+		}	
+	}
+	
+	while(fread(&db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
+		
+		fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+	
+	}
+	
+	if(arrange_count!=arr_size){
+		
 		fprintf(log, "%s", MSJ_ERROR_BAJA);
-       	fwrite(*db_book, sizeof(book_t), SINGLE_CONST, temporal);
-            
-      	if((fread(*arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
-                
-        	(*arrange_count)++;
-			comparaciones_baja(temporal, database, log, arrange, arrange_count, db_book, arrange_book);
-   	    }
-    }
-        
-	else{  
-            
-        if((fread(*arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
-                				(*arrange_count)++; 
-		}    
-	}   
+		
+	}
+	
+	return ST_OK;
+		
 }
-
 	
 t_status realizar_modificacion(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
 	
-	book_t *db_book;
-	book_t *arrange_book;
+	book_t db_book;
+	book_t arrange_book;
 	size_t arrange_count=SINGLE_CONST;
 	
 	fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
 	
-	while(fread(&db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST || arrange_count==arr_size){
-	
-		comparaciones_modificaciones(temporal, database, log, arrange, &arrange_count, &db_book, &arrange_book);
+	while(fread(&db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
+		
+		if(db_book.id<arrange_book.id){
+			
+			fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
+			continue;	
+		}
+		
+		if(db_book.id==arrange_book.id){
+			
+			fwrite(&arrange_book, sizeof(book_t), SINGLE_CONST, temporal);
+			if((fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
+			
+				arrange_count++;
+				continue;
+			}
+			
+			else break;
+		}
 	}
+	
 	while((fread(&db_book, sizeof(book_t), SINGLE_CONST, database))!=SINGLE_CONST){
 		
 		fwrite(&db_book, sizeof(book_t), SINGLE_CONST, temporal);
@@ -245,37 +258,6 @@ t_status realizar_modificacion(FILE *temporal, FILE *database, FILE *log, FILE *
 	}
 
 	return ST_OK;
-}
-
-void comparaciones_modificaciones(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t *arrange_count,book_t **db_book,book_t **arrange_book){
-	 
-	if((*db_book)->id < (*arrange_book)->id){
-            
-		fwrite(*db_book, sizeof(book_t), SINGLE_CONST, temporal);                                                                         
-	}
-
-	else if((*db_book)->id > (*arrange_book)->id){  /*Esto puede ocurrir solo si se quiere dar modificar un registro que no existe*/
-
-		fprintf(log, "%s", MSJ_ERROR_MODIFICACIONES);
-		fwrite(*db_book, sizeof(book_t), SINGLE_CONST, temporal);
-            
-		if((fread(*arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
-                
-			(*arrange_count)++;
-			comparaciones_modificaciones(temporal, database, log, arrange, arrange_count, db_book, arrange_book);
-		}
-	}
-        
-	else{ 
-           
-		fwrite(&arrange_book, sizeof(book_t), SINGLE_CONST, temporal);
-
-		if((fread(*arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
-                
-			(*arrange_count)++;
-        }    
-                
-	}   
 }
 
 t_status realizar_alta(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
