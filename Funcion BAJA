@@ -1,0 +1,59 @@
+t_status realizar_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t arr_size){
+    
+    book_t *db_book;
+    book_t *arrange_book;
+    size_t arrange_count;
+    
+    fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
+    
+    while(fread(db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST || arrange_count==arr_size){
+       
+        comparaciones_baja(temporal, database, log, arrange, &arrange_count, &db_book, &arrange_book);
+    }
+    
+    while(fread(db_book, sizeof(book_t), SINGLE_CONST, database)!=SINGLE_CONST){
+        
+        fwrite(db_book, sizeof(book_t), SINGLE_CONST, temporal);
+    
+    }
+    
+    if(arrange_count!=arr_size){
+        
+        fprintf(log, "%s", MSJ_ERROR_BAJA);
+        
+   }
+    
+    return ST_OK;
+        
+}
+
+void comparaciones_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange, size_t *arrange_count,book_t **db_book,book_t **arrange_book){
+     
+     /*saque los contnue y else break porque esto ya no esta en un ciclo*/
+        if((*db_book)->id < (*arrange_book)->id){
+            
+            fwrite(*db_book, sizeof(book_t), SINGLE_CONST, temporal);                                                                         
+        }
+
+        else if((*db_book)->id > (*arrange_book)->id){  /*Esto puede ocurrir solo si se quiere dar de baja un registro que no existe*/
+
+            fprintf(log, "%s", MSJ_ERROR_BAJA);
+            fwrite(*db_book, sizeof(book_t), SINGLE_CONST, temporal);
+            
+            if((fread(*arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
+                
+                (*arrange_count)++;
+                comparaciones_baja(temporal, database, log, arrange, arrange_count, db_book, arrange_book);
+            }
+        }
+        
+        else{   /*CASO que son iguales*/
+            
+            if((fread(*arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
+                
+                (*arrange_count)++;
+                
+            }    
+                
+        }   
+}
