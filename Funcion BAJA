@@ -2,7 +2,7 @@ t_status realizar_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange,
     
     book_t *db_book;
     book_t *arrange_book;
-    size_t arrange_count;
+    size_t arrange_count=SINGLE_CONST;
     
     fread(&arrange_book, sizeof(book_t), SINGLE_CONST, arrange);
     
