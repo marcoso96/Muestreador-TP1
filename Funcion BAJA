@@ -32,10 +32,10 @@ void comparaciones_baja(FILE *temporal, FILE *database, FILE *log, FILE *arrange
         }
 
         else if((*db_book)->id > (*arrange_book)->id){  /*Esto puede ocurrir solo si se quiere dar de baja un registro que no existe*/
-
+            /*Informo el error, tiro a la basura el registro este de arrange y leo otro de arrange si puedo.
+            En dicho caso, necesito seguir comparando el (*db_book)->id  con el proximo  (*arrange_book)->id*/
             fprintf(log, "%s", MSJ_ERROR_BAJA);
-            fwrite(*db_book, sizeof(book_t), SINGLE_CONST, temporal);
-            
+       
             if((fread(*arrange_book, sizeof(book_t), SINGLE_CONST, arrange))!=SINGLE_CONST){
                 
                 (*arrange_count)++;
